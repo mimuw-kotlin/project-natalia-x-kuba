@@ -17,9 +17,19 @@ The Real game Of Lovely Life is a complex terminal game that will take you to th
 - No Microtransactions (yet)
 
 ## Plan
-In the first part we're going to implement the basics: movement, reproduction, time travel and ads. Players will be able to explore the beauty of TROLL. 
+In the first part we're going to implement the basics: 
+  - finite field
+  - time travel
+  - basic adds
+  - interactive terminal
+  - basic menu
 
-In the second part we're going to add more features like: microtransactions, more ads, more cells and more fun! 
+In the second part we're going to add more features like: 
+  - micro transactions
+  - more ads
+  - infinite field
+  - advanced menu
+  - camera movement
 
 ## Technologies
 - Concurency

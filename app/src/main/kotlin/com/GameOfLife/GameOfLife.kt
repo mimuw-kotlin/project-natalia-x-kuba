@@ -1,5 +1,7 @@
 package com.GameOfLife
 
+import app.src.main.kotlin.com.GameOfLife.Screen
+import app.src.main.kotlin.com.GameOfLife.UserInput
 import java.io.Console
 import java.util.concurrent.Semaphore
 import kotlin.concurrent.thread
@@ -58,7 +60,7 @@ class GameOfLife {
         }
     }
 
-    fun userInput() {
+    fun _userInput() {
         while (stillPlaying) {
             val key = System.`in`.read()
             // Check for q key
@@ -147,7 +149,7 @@ class GameOfLife {
     }
 }
 
-fun main(args: Array<String>) {
+fun _main(args: Array<String>) {
     val game = GameOfLife()
 
     val console: Console? = System.console()
@@ -162,7 +164,7 @@ fun main(args: Array<String>) {
 
     val thread_timer = Thread { game.timer() }
     val thread_screen = Thread { game.updateScreen() }
-    val thread_input = Thread { game.userInput() }
+    val thread_input = Thread { game._userInput() }
 
     // Start both threads
     try {
@@ -180,4 +182,50 @@ fun main(args: Array<String>) {
         // Restore terminal to normal mode
         Runtime.getRuntime().exec(arrayOf("/bin/sh", "-c", "stty -raw echo < /dev/tty")).waitFor()
     }
+}
+
+fun main(args: Array<String>) {
+    val screen = Screen()
+
+    try {
+        Runtime.getRuntime().exec(arrayOf("/bin/sh", "-c", "stty raw -echo < /dev/tty")).waitFor()
+        while (true) {
+            val key = System.`in`.read().toChar()
+            println("Key Pressed: $key")
+            if (key == 'q') break
+        }
+    }
+    catch (e: Exception) {
+        println("Error: ${e.message}")
+    }
+    finally {
+        Runtime.getRuntime().exec(arrayOf("/bin/sh", "-c", "stty -raw echo < /dev/tty")).waitFor()
+    }
+
+
+
+    /*
+
+
+
+    // Handle termination (e.g., Ctrl+C)
+    val shutdownHook = Thread {
+        screen.exitScreen()
+    }
+    // Register the shutdown hook
+    Runtime.getRuntime().addShutdownHook(shutdownHook)
+
+    val userInput = Thread { UserInput(screen).run() }
+
+    try {
+        screen.initScreen()
+        screen.updateScreen()
+        userInput.start()
+        Thread.sleep(5000)
+    } finally {
+        userInput.interrupt()
+        screen.exitScreen()
+
+    }
+    */
 }
