@@ -1,7 +1,8 @@
 package com.GameOfLife
 
+import app.src.main.kotlin.com.GameOfLife.Ad
 import app.src.main.kotlin.com.GameOfLife.Screen
-import app.src.main.kotlin.com.GameOfLife.UserInput
+import app.src.main.kotlin.com.GameOfLife.Timer
 import java.io.Console
 import java.util.concurrent.Semaphore
 import kotlin.concurrent.thread
@@ -186,20 +187,41 @@ fun _main(args: Array<String>) {
 
 fun main(args: Array<String>) {
     val screen = Screen()
+    val timer = Timer(screen)
+    val ad = Ad(screen)
+
+    val thread_timer = Thread { timer.run() }
+    val thread_ad = Thread { ad.run() }
+
+    screen.initScreen()
+    screen.updateScreen()
 
     try {
+        thread_timer.start()
+        thread_ad.start()
         Runtime.getRuntime().exec(arrayOf("/bin/sh", "-c", "stty raw -echo < /dev/tty")).waitFor()
         while (true) {
             val key = System.`in`.read().toChar()
-            println("Key Pressed: $key")
-            if (key == 'q') break
+            when (key) {
+                'w' -> screen.moveCursor("UP")
+                's' -> screen.moveCursor("DOWN")
+                'a' -> screen.moveCursor("LEFT")
+                'd' -> screen.moveCursor("RIGHT")
+                ' ' -> screen.changeBoardPixel()
+                ',' -> timer.decreaseSpeed()
+                '.' -> timer.increaseSpeed()
+                'q' -> break
+            }
         }
     }
     catch (e: Exception) {
         println("Error: ${e.message}")
     }
     finally {
+        thread_timer.interrupt()
+        thread_ad.interrupt()
         Runtime.getRuntime().exec(arrayOf("/bin/sh", "-c", "stty -raw echo < /dev/tty")).waitFor()
+        screen.exitScreen()
     }
 
 

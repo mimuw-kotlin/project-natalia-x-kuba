@@ -28,4 +28,10 @@ class Pixel(private var character: String, private var color: String, private va
         }
         this.bgColor = bgColor
     }
+
+    companion object {
+        fun createArray(line: String): Array<Pixel> {
+            return Array(line.length) { Pixel(line[it].toString()) }
+        }
+    }
 }

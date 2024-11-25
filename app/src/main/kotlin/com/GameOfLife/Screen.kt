@@ -26,6 +26,7 @@ class Screen {
             "RIGHT" -> cursor = Pair(cursor.first, (cursor.second + 1) % BOARD_COLS)
         }
         board[cursor.first][cursor.second].setBgColor("grey")
+        this.updateScreen()
     }
 
     public fun changeBoardPixel() {
@@ -34,26 +35,28 @@ class Screen {
         } else {
             board[cursor.first][cursor.second].setCharacter(".")
         }
+        this.updateScreen()
     }
 
     public fun exitScreen() {
-        repeat(ROWS + 3) { print("\u001b[1A") }
+        repeat(ROWS + 3) { print("\r\u001b[1A") }
         print("\u001b[2K")
-        println("\rThank you for playing!!\r")
+        println("\rThank you for playing!!")
         System.out.flush()
         print("\u001B[?25h")
     }
 
+    @Synchronized
     public fun updateScreen() {
-        repeat(ROWS + 3) { print("\u001b[1A") }
+        repeat(ROWS + 3) { print("\r\u001b[1A") }
         val timeText = getTime()
         val speedText = getSpeed()
 
         // print top row
-        println("TRgOLL NxK  \t\t$timeText\t\t  Speed: $speedText")
+        print("TRgOLL NxK  \t\t$timeText\t\t  Speed: $speedText\n\r")
 
         repeat(2 * BOARD_COLS + AD_COLS + 2) { print("-") }
-        println()
+        print("\n\r")
 
         for (i in 0 until ROWS) {
             print("\r|")
@@ -96,5 +99,20 @@ class Screen {
             5 -> "#####"
             else -> "?????"
         }
+    }
+
+    public fun updateTime(time: Int) {
+        this.time = time
+        this.updateScreen()
+    }
+
+    public fun updateSpeed(speed: Int) {
+        this.speed = speed
+        this.updateScreen()
+    }
+
+    public fun changeAd(ad: Array<Array<Pixel>>) {
+        this.ad = ad
+        this.updateScreen()
     }
 }
