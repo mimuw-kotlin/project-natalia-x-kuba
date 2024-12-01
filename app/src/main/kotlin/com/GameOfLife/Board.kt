@@ -16,4 +16,10 @@ class Board(val screen: Screen){
 
         screen.updateGameBoardPixel(cursor.first, cursor.second, board[cursor.first][cursor.second])
     }
+
+    fun calculateNewBoard() {
+        // TODO
+
+        screen.updateGameBoard(board)
+    }
 }

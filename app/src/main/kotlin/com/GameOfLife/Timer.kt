@@ -51,7 +51,7 @@ class Timer (var screen: Screen) {
                     sleep.acquire()
                     mutex.acquire()
                 }
-                Thread.sleep(1000L / speed)
+                Thread.sleep(1000L / speed)         // FIXME: This is not the correct way to implement a timer
                 localTime += 1
                 screen.updateTime(localTime)
                 sleep.release()
