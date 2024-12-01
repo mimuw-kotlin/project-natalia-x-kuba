@@ -4,6 +4,7 @@ class Pixel(private var character: String, private var color: String, private va
     private val RESET = "\u001b[0m"
 
     constructor(character: String) : this(character, "", "")
+    constructor(character: String, color: String) : this(character, color, "")
 
     public fun getValue(): String {
         return this.color + this.bgColor + this.character + RESET
@@ -18,6 +19,14 @@ class Pixel(private var character: String, private var color: String, private va
     }
 
     public fun setColor(color: String) {
+        if (color == "red") {
+            this.color = "\u001B[31m";
+            return;
+        }
+        if (color == "green") {
+            this.color = "\u001B[32m";
+            return;
+        }
         this.color = color
     }
 
@@ -32,6 +41,9 @@ class Pixel(private var character: String, private var color: String, private va
     companion object {
         fun createArray(line: String): Array<Pixel> {
             return Array(line.length) { Pixel(line[it].toString()) }
+        }
+        fun createArray(line: String, color: String): Array<Pixel> {
+            return Array(line.length) { Pixel(line[it].toString(), color) }
         }
     }
 }
