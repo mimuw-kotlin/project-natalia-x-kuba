@@ -16,7 +16,11 @@ class Screen {
     private var ad = Array(ROWS) { Array(AD_COLS) { Pixel("$") } }
 
     private val mutex = Semaphore(1, true)
+    private lateinit var menu: Menu
 
+    public fun setMenu(menu: Menu) {
+        this.menu = menu
+    }
 
     public fun initScreen() {
         mutex.acquire()
@@ -182,6 +186,19 @@ class Screen {
         this.updateScreen()
     }
 
+    public fun updateMenuBoard(board: Array<Array<Pixel>>) {
+        mutex.acquire()
+
+        for (i in 0 until ROWS) {
+            for (j in 0 until MENU_BOARD_COLS) {
+                menu_board[i][j] = board[i][j]
+            }
+        }
+
+        mutex.release()
+        this.updateScreen()
+    }
+
     public fun switchGameOrMenu() {
         mutex.acquire()
 
@@ -192,6 +209,9 @@ class Screen {
         }
 
         mutex.release()
-        this.updateScreen()
+
+        if (game_or_menu == "menu") {
+            menu.display()
+        }
     }
 }

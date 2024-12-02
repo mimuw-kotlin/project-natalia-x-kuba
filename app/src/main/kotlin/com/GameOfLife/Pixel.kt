@@ -4,7 +4,9 @@ class Pixel(private var character: String, private var color: String, private va
     private val RESET = "\u001b[0m"
 
     constructor(character: String) : this(character, "", "")
-    constructor(character: String, color: String) : this(character, color, "")
+    constructor(character: String, color: String) : this(character, color, "") {
+        setColor(color)
+    }
 
     public fun getValue(): String {
         return this.color + this.bgColor + this.character + RESET
