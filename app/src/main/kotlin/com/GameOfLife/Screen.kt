@@ -1,19 +1,16 @@
 package app.src.main.kotlin.com.GameOfLife
 
+import com.GameOfLife.Settings
 import java.util.concurrent.Semaphore
 
 class Screen {
-    private val ROWS = 20
-    private val GAME_BOARD_COLS = 20
-    private val MENU_BOARD_COLS = 39
-    private val AD_COLS = 20
     private var time = 0
     private var speed = 1
     private var cursor = Pair(0, 0)
-    private var game_board = Array(ROWS) { Array(GAME_BOARD_COLS) { Pixel(".") } }
-    private var menu_board = Array(ROWS) { Array(MENU_BOARD_COLS) { Pixel("?") } }
+    private var game_board = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { Pixel(".") } }
+    private var menu_board = Array(Settings.ROWS) { Array(Settings.MENU_BOARD_COLS) { Pixel("?") } }
     private var game_or_menu  = "game"
-    private var ad = Array(ROWS) { Array(AD_COLS) { Pixel("$") } }
+    private var ad = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
 
     private val mutex = Semaphore(1, true)
     private lateinit var menu: Menu
@@ -39,10 +36,10 @@ class Screen {
 
         game_board[cursor.first][cursor.second].setBgColor("")
         when (direction) {
-            "UP" -> cursor = Pair((cursor.first - 1 + ROWS) % ROWS, cursor.second)
-            "DOWN" -> cursor = Pair((cursor.first + 1) % ROWS, cursor.second)
-            "LEFT" -> cursor = Pair(cursor.first, (cursor.second - 1 + GAME_BOARD_COLS) % GAME_BOARD_COLS)
-            "RIGHT" -> cursor = Pair(cursor.first, (cursor.second + 1) % GAME_BOARD_COLS)
+            "UP" -> cursor = Pair((cursor.first - 1 + Settings.ROWS) % Settings.ROWS, cursor.second)
+            "DOWN" -> cursor = Pair((cursor.first + 1) % Settings.ROWS, cursor.second)
+            "LEFT" -> cursor = Pair(cursor.first, (cursor.second - 1 + Settings.GAME_BOARD_COLS) % Settings.GAME_BOARD_COLS)
+            "RIGHT" -> cursor = Pair(cursor.first, (cursor.second + 1) % Settings.GAME_BOARD_COLS)
         }
         game_board[cursor.first][cursor.second].setBgColor("grey")
 
@@ -54,7 +51,7 @@ class Screen {
     public fun exitScreen() {
         mutex.acquire()
 
-        repeat(ROWS + 3) { print("\r\u001b[1A") }
+        repeat(Settings.ROWS + 3) { print("\r\u001b[1A") }
         print("\u001b[2K")
         println("\rThank you for playing!!")
         System.out.flush()
@@ -67,39 +64,39 @@ class Screen {
     public fun updateScreen() {
         mutex.acquire()
 
-        repeat(ROWS + 3) { print("\r\u001b[1A") }
+        repeat(Settings.ROWS + 3) { print("\r\u001b[1A") }
         val timeText = getTime()
         val speedText = getSpeed()
 
         // print top row
         print("TRgOLL NxK  \t\t$timeText\t\t  Speed: $speedText\n\r")
 
-        repeat(2 * GAME_BOARD_COLS + AD_COLS + 2) { print("-") }
+        repeat(2 * Settings.GAME_BOARD_COLS + Settings.AD_COLS + 2) { print("-") }
         print("\n\r")
 
-        for (i in 0 until ROWS) {
+        for (i in 0 until Settings.ROWS) {
             print("\r|")
 
-            for (j in 0 until AD_COLS) {
+            for (j in 0 until Settings.AD_COLS) {
                 print(ad[i][j].getValue())
             }
 
             print("|")
             if (game_or_menu == "game") {
-                for (j in 0 until GAME_BOARD_COLS) {
+                for (j in 0 until Settings.GAME_BOARD_COLS) {
                     print(game_board[i][j].getValue())
                     print(" ")
                 }
                 print("\u001B[D|\n\r")
             } else if (game_or_menu == "menu") {
-                for (j in 0 until MENU_BOARD_COLS) {
+                for (j in 0 until Settings.MENU_BOARD_COLS) {
                     print(menu_board[i][j].getValue())
                 }
                 print("|\n\r")
             }
         }
 
-        repeat(2 * GAME_BOARD_COLS + AD_COLS + 2) { print("-") }
+        repeat(2 * Settings.GAME_BOARD_COLS + Settings.AD_COLS + 2) { print("-") }
         println()
 
         System.out.flush()
@@ -176,8 +173,8 @@ class Screen {
     public fun updateGameBoard(board: Array<Array<String>>) {
         mutex.acquire()
 
-        for (i in 0 until ROWS) {
-            for (j in 0 until GAME_BOARD_COLS) {
+        for (i in 0 until Settings.ROWS) {
+            for (j in 0 until Settings.GAME_BOARD_COLS) {
                 game_board[i][j].setCharacter(board[i][j])
             }
         }
@@ -189,8 +186,8 @@ class Screen {
     public fun updateMenuBoard(board: Array<Array<Pixel>>) {
         mutex.acquire()
 
-        for (i in 0 until ROWS) {
-            for (j in 0 until MENU_BOARD_COLS) {
+        for (i in 0 until Settings.ROWS) {
+            for (j in 0 until Settings.MENU_BOARD_COLS) {
                 menu_board[i][j] = board[i][j]
             }
         }
@@ -212,6 +209,8 @@ class Screen {
 
         if (game_or_menu == "menu") {
             menu.display()
+        } else {
+            this.updateScreen()
         }
     }
 }

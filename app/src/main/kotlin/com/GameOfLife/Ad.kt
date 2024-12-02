@@ -1,13 +1,12 @@
 package app.src.main.kotlin.com.GameOfLife
 
 import app.src.main.kotlin.com.GameOfLife.Pixel
+import com.GameOfLife.Settings
 
 class Ad (val screen: Screen) {
-    private val ROWS = 20
-    private val AD_COLS = 20
-    private var ad1: Array<Array<Pixel>> = Array(ROWS) { Array(AD_COLS) { Pixel("$") } }
-    private var ad_xtb: Array<Array<Pixel>> = Array(ROWS) { Array(AD_COLS) { Pixel("$") } }
-    private var ad_codeforia: Array<Array<Pixel>> = Array(ROWS) { Array(AD_COLS) { Pixel("$") } }
+    private var ad1: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
+    private var ad_xtb: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
+    private var ad_codeforia: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
     private var current_add = 1
 
     fun init_xtb() {

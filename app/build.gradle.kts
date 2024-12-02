@@ -12,13 +12,8 @@ repositories {
 }
 
 dependencies {
-    // Use the Kotlin JUnit 5 integration.
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-
-    // Use the JUnit 5 engine.
-    testImplementation(libs.junit.jupiter.engine)
-
-    // JUnit platform launcher needed for tests.
+    // JUnit 5 dependencies for testing.
+    testImplementation(libs.junitJupiterApi)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Application dependency
@@ -27,6 +22,7 @@ dependencies {
     // Coroutines dependency
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
 
+    // JLine for CLI
     implementation("org.jline:jline:3.21.0")
 }
 
@@ -38,6 +34,7 @@ java {
 }
 
 application {
+    // Define the main class for the application
     mainClass.set("com.GameOfLife.GameOfLifeKt")
 }
 

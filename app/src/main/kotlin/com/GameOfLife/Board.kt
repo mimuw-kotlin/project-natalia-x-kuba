@@ -1,9 +1,9 @@
 package app.src.main.kotlin.com.GameOfLife
 
+import com.GameOfLife.Settings
+
 class Board(val screen: Screen){
-    private val ROWS = 20
-    private val COLUMNS = 20
-    private var board: Array<Array<String>> = Array(ROWS) { Array(COLUMNS) { "." } }
+    private var board: Array<Array<String>> = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { "." } }
 
     fun changeBoardPixel() {
         val cursor = screen.getCursor()
