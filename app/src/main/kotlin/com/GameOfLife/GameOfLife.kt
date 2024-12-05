@@ -8,7 +8,15 @@ import kotlin.concurrent.thread
 
 fun main(args: Array<String>) {
     val screen = Screen()
+<<<<<<< Updated upstream
     val menu = MainMenu(screen, "Main Menu"); screen.setMenu(menu)
+=======
+    MainMenu.screen = screen
+    PremiumMenu.screen = screen
+    val menu = MainMenu
+    val timer = Timer(screen)
+    val ad = Ad(screen)
+>>>>>>> Stashed changes
     val gameBoard = Board(screen)
     val timer = Timer(screen, gameBoard)
     val ad = Ad(screen)

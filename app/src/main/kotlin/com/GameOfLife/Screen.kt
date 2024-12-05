@@ -13,11 +13,8 @@ class Screen {
     private var ad = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
 
     private val mutex = Semaphore(1, true)
-    private lateinit var menu: Menu
+    private var menu: Menu = MainMenu
 
-    public fun setMenu(menu: Menu) {
-        this.menu = menu
-    }
 
     public fun initScreen() {
         mutex.acquire()
@@ -50,13 +47,11 @@ class Screen {
 
     public fun exitScreen() {
         mutex.acquire()
-
         repeat(Settings.ROWS + 3) { print("\r\u001b[1A") }
         print("\u001b[2K")
         println("\rThank you for playing!!")
         System.out.flush()
         print("\u001B[?25h")
-
         mutex.release()
     }
 
@@ -171,6 +166,7 @@ class Screen {
         this.updateScreen()
     }
 
+
     public fun updateGameBoard(board: Array<Array<String>>) {
         mutex.acquire()
 
@@ -184,6 +180,7 @@ class Screen {
         this.updateScreen()
     }
 
+
     public fun updateMenuBoard(board: Array<Array<Pixel>>) {
         mutex.acquire()
 
@@ -196,6 +193,7 @@ class Screen {
         mutex.release()
         this.updateScreen()
     }
+
 
     public fun switchGameOrMenu() {
         mutex.acquire()

@@ -1,13 +1,15 @@
 package app.src.main.kotlin.com.GameOfLife
 
+import com.GameOfLife.Clickable
 import com.GameOfLife.Settings
 
-abstract class Menu(val screen: Screen, val name: String) {
+abstract class Menu : Clickable {
     var board: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.MENU_BOARD_COLS) { Pixel(" ") } }
-    lateinit var children: Array<Pair<Menu, Int>>
-    var line_to_hover = 0
+    abstract var children: Array<Pair<Clickable, Int>>
+    lateinit var screen: Screen
+    private var lineToHover = 0
 
-    // Initialize board and handle 'name' initialization
+    // Initialize board
     init {
         // Populate the board with default content
         board[1] = Pixel.createArray("                                       ")
@@ -30,17 +32,15 @@ abstract class Menu(val screen: Screen, val name: String) {
     }
 
     fun display() {
-        line_to_hover = 0
+        lineToHover = 0
         screen.updateMenuBoard(board)
     }
 
     fun markHovered() {
-        board[line_to_hover].forEach { it.setBgColor("grey") }
+        board[lineToHover].forEach { it.setBgColor("grey") }
     }
 
     fun unmarkHovered() {
-        board[line_to_hover].forEach { it.setBgColor("") }
+        board[lineToHover].forEach { it.setBgColor("") }
     }
-
-    abstract fun query(key: Char)
 }
