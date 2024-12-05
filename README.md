@@ -20,7 +20,7 @@ The Real game Of Lovely Life is a complex terminal game that will take you to th
 In the first part we're going to implement the basics: 
   - finite field
   - time travel
-  - basic adds
+  - basic ads
   - interactive terminal
   - basic menu
 
