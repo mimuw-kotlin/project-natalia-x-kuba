@@ -16,12 +16,12 @@ class Timer (var screen: Screen, var board: Board) {
         }
 
         speed += 1
-        screen.updateSpeed(speed)
 
         if (speed == 1) {
             sleep.release()
         }
         mutex.release()
+        screen.updateSpeed(speed)
     }
 
     fun decreaseSpeed() {
@@ -32,7 +32,6 @@ class Timer (var screen: Screen, var board: Board) {
         }
 
         speed -= 1
-        screen.updateSpeed(speed)
 
         if (speed == 0) {
             mutex.release()
@@ -40,6 +39,7 @@ class Timer (var screen: Screen, var board: Board) {
         } else {
             mutex.release()
         }
+        screen.updateSpeed(speed)
     }
 
     fun run () {
@@ -51,7 +51,9 @@ class Timer (var screen: Screen, var board: Board) {
                     sleep.acquire()
                     mutex.acquire()
                 }
+                mutex.release()
                 Thread.sleep(1000L / speed)         // FIXME: This is not the correct way to implement a timer
+                mutex.acquire()
                 localTime += 1
                 screen.updateTime(localTime)
                 board.calculateNewBoard()
