@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     // JUnit 5 dependencies for testing.
-    testImplementation(libs.junitJupiterApi)
+//    testImplementation(libs.junitJupiterApi)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Application dependency

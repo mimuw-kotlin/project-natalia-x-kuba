@@ -136,6 +136,7 @@ class Screen {
 
         this.time = time
 
+
         mutex.release()
         this.updateScreen()
     }

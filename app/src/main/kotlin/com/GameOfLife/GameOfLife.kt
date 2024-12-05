@@ -9,9 +9,9 @@ import kotlin.concurrent.thread
 fun main(args: Array<String>) {
     val screen = Screen()
     val menu = MainMenu(screen, "Main Menu"); screen.setMenu(menu)
-    val timer = Timer(screen)
-    val ad = Ad(screen)
     val gameBoard = Board(screen)
+    val timer = Timer(screen, gameBoard)
+    val ad = Ad(screen)
 
     val thread_timer = Thread { timer.run() }
     val thread_ad = Thread { ad.run() }
