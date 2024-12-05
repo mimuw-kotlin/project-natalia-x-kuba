@@ -1,14 +1,76 @@
 package app.src.main.kotlin.com.GameOfLife
+import java.io.BufferedReader
+import kotlinx.coroutines.*
+import java.io.InputStreamReader
 
-import app.src.main.kotlin.com.GameOfLife.Pixel
 import com.GameOfLife.Settings
 
 class Ad (val screen: Screen) {
     private var ad1: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
     private var ad_xtb: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
+    private var ad_wifi: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
     private var ad_codeforia: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
-    private var current_add = 1
+    private var current_ad = 1
 
+    private fun getWifiNetworks(): List<String> {
+        val networks = mutableListOf<String>()
+
+        try {
+            val command = when {
+                System.getProperty("os.name").contains("Windows", ignoreCase = true) -> "netsh wlan show networks"
+                System.getProperty("os.name").contains("Mac", ignoreCase = true) -> "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -s"
+                else -> "nmcli dev wifi list"
+            }
+
+            val process = ProcessBuilder(command.split(" ")).start()
+            val reader = BufferedReader(InputStreamReader(process.inputStream))
+
+            reader.useLines { lines ->
+                lines.forEach { line ->
+                    if (!line.contains("SSID", ignoreCase = true) && !line.contains("--")) {
+                        val parts = line.drop(1).split(Regex("\\s{2,}")).filter { it.isNotEmpty() }
+                        val networkName = parts[1].take(6)
+                        val signalBars = parts[parts.size - 2]
+                        networks.add(networkName + " " + signalBars)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            println("Error while fetching Wi-Fi networks: ${e.message}")
+        }
+
+        return networks
+    }
+
+
+    fun runForThreeSeconds() {
+        val startTime = System.currentTimeMillis()
+        GlobalScope.launch {
+            while (System.currentTimeMillis() - startTime < 3000) {
+                init_wifi(1)
+                screen.changeAd(ad_wifi)
+                delay(500)
+                init_wifi(2)
+                screen.changeAd(ad_wifi)
+                delay(500)
+                init_wifi(3)
+                screen.changeAd(ad_wifi)
+                delay(500)
+            }
+        }
+    }
+
+
+    /*
+  ┌────────┐
+ ┌┘┌──────┐└┐
+┌┘┌┘      └┐└┐
+│┌┘ ┌────┐ └┐│
+││ ┌┘┌──┐└┐ ││
+└┘ |┌┘  └┐| └┘
+   └┘ ┌┐ └┘
+      └┘
+ */
     fun init_xtb() {
         ad_xtb[0] = Pixel.createArray("                    ")
         ad_xtb[1] = Pixel.createArray("   ╭━╮╭━┳━━━━┳━━╮   ", "red")
@@ -78,9 +140,67 @@ class Ad (val screen: Screen) {
 
     }
 
+    private fun init_wifi(state: Int) {
+        val networks = getWifiNetworks()
+        val lines = List(6) { index ->
+            if (index < networks.size) {
+                val network = networks[index]
+                if (network.length > 20) {
+                    network.substring(0, 20)
+                } else {
+                    network.padEnd(20)
+                }
+            } else {
+                " ".repeat(20)
+            }
+        }
+
+        if (state == 1) {
+            ad_wifi[1] = Pixel.createArray("                    ", "red")
+            ad_wifi[2] = Pixel.createArray("                    ", "red")
+            ad_wifi[3] = Pixel.createArray("                    ", "red")
+            ad_wifi[4] = Pixel.createArray("                    ", "red")
+            ad_wifi[5] = Pixel.createArray("                    ", "red")
+            ad_wifi[6] = Pixel.createArray("                    ", "red")
+            ad_wifi[7] = Pixel.createArray("         ┌┐         ", "red")
+            ad_wifi[8] = Pixel.createArray("         └┘         ", "red")
+        } else if (state == 2) {
+            ad_wifi[1] = Pixel.createArray("                    ", "red")
+            ad_wifi[2] = Pixel.createArray("                    ", "red")
+            ad_wifi[3] = Pixel.createArray("                    ", "red")
+            ad_wifi[4] = Pixel.createArray("       ┌────┐       ", "red")
+            ad_wifi[5] = Pixel.createArray("      ┌┘┌──┐└┐      ", "red")
+            ad_wifi[6] = Pixel.createArray("      |┌┘  └┐|      ", "red")
+            ad_wifi[7] = Pixel.createArray("      └┘ ┌┐ └┘      ", "red")
+            ad_wifi[8] = Pixel.createArray("         └┘         ", "red")
+        } else {
+            ad_wifi[0] = Pixel.createArray("                    ")
+            ad_wifi[1] = Pixel.createArray("     ┌────────┐     ", "red")
+            ad_wifi[2] = Pixel.createArray("    ┌┘┌──────┐└┐    ", "red")
+            ad_wifi[3] = Pixel.createArray("   ┌┘┌┘      └┐└┐   ", "red")
+            ad_wifi[4] = Pixel.createArray("   │┌┘ ┌────┐ └┐│   ", "red")
+            ad_wifi[5] = Pixel.createArray("   ││ ┌┘┌──┐└┐ ││   ", "red")
+            ad_wifi[6] = Pixel.createArray("   └┘ |┌┘  └┐| └┘   ", "red")
+            ad_wifi[7] = Pixel.createArray("      └┘ ┌┐ └┘      ", "red")
+            ad_wifi[8] = Pixel.createArray("         └┘         ", "red")
+        }
+        ad_wifi[9] = Pixel.createArray("                    ")
+        ad_wifi[10] = Pixel.createArray("HOT SIGNALS IN      ")
+        ad_wifi[11] = Pixel.createArray("YOUR AREA           ")
+        ad_wifi[12] = Pixel.createArray("                    ")
+        ad_wifi[13] = Pixel.createArray(lines[0])
+        ad_wifi[14] = Pixel.createArray(lines[1])
+        ad_wifi[15] = Pixel.createArray(lines[2])
+        ad_wifi[16] = Pixel.createArray(lines[3])
+        ad_wifi[17] = Pixel.createArray(lines[4])
+        ad_wifi[18] = Pixel.createArray(lines[5])
+        ad_wifi[19] = Pixel.createArray("                    ")
+    }
+
     init {
         init_xtb()
         init_codeforia()
+        init_wifi(1)
         ad1[0] = Pixel.createArray("     .-''''''-.     ")
         ad1[1] = Pixel.createArray("   .'          '.   ")
         ad1[2] = Pixel.createArray("  /   O      O   \\  ")
@@ -110,6 +230,7 @@ class Ad (val screen: Screen) {
                 Thread.sleep(3000L)
                 screen.changeAd(ad_codeforia)
                 Thread.sleep(3000L)
+                runForThreeSeconds()
             }
         } catch (e: Exception) {
             ;
