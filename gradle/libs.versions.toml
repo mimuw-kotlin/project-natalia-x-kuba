@@ -8,6 +8,7 @@ junit-jupiter-engine = "5.10.3"
 [libraries]
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter-engine" }
+junitJupiterApi = "org.junit.jupiter:junit-jupiter-api:5.8.2"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.0.0" }
