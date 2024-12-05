@@ -18,12 +18,16 @@ class Ad (val screen: Screen) {
         try {
             val command = when {
                 System.getProperty("os.name").contains("Windows", ignoreCase = true) -> {
-                    networks.add("sorry, only Linux users get signals")
+                    networks.add("sorry, only Linux")
+                    networks.add("users can get")
+                    networks.add("hot signals")
                     ""
                     return networks
                 }
                 System.getProperty("os.name").contains("Mac", ignoreCase = true) -> {
-                    networks.add("sorry, only Linux users get signals")
+                    networks.add("sorry, only Linux")
+                    networks.add("users can get")
+                    networks.add("hot signals")
                     ""
                     return networks
                 }
@@ -128,9 +132,9 @@ class Ad (val screen: Screen) {
         ad_codeforia[15] = Pixel.createArray("|__ |   )|  )| |   )", "green")
         ad_codeforia[16] = Pixel.createArray("|   |__/ |   | |__/|", "green")
         ad_codeforia[17] = Pixel.createArray("                    ")
-        ad_codeforia[18] = Pixel.createArray("codefora.com - learn")
-        ad_codeforia[19] = Pixel.createArray("Python for free now!")
-        for (i in 10..15) { ad_codeforia[19][i].setColor("green") }
+        ad_codeforia[18] = Pixel.createArray("   codeforia.com    ")
+        for (i in 7..11) { ad_codeforia[18][i].setColor("green") }
+        ad_codeforia[19] = Pixel.createArray(" learn Python now!  ")
 
 
         /*
