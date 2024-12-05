@@ -207,9 +207,17 @@ class Screen {
         mutex.release()
 
         if (game_or_menu == "menu") {
+            menu = MainMenu
+            menu.reset()
             menu.display()
         } else {
             this.updateScreen()
         }
+    }
+
+    public fun setMenu(menu: Menu) {
+        this.menu = menu
+        menu.reset()
+        menu.display()
     }
 }

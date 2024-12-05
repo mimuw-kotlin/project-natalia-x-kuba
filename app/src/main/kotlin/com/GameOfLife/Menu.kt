@@ -5,20 +5,21 @@ import com.GameOfLife.Settings
 
 abstract class Menu : Clickable {
     var board: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.MENU_BOARD_COLS) { Pixel(" ") } }
-    abstract var children: Array<Pair<Clickable, Int>>
+    abstract var children: Array<Clickable>
     lateinit var screen: Screen
-    private var lineToHover = 0
+    protected var cursor: Int = 0
 
     // Initialize board
     init {
+        reset()
         // Populate the board with default content
         board[1] = Pixel.createArray("                                       ")
-        board[2] = Pixel.createArray("     _____ ____        ___  _          ")
-        board[3] = Pixel.createArray("    |_   _|  _ \\ __ _ / _ \\| |         ")
-        board[4] = Pixel.createArray("      | | | |_) / _` | | | | |         ")
-        board[5] = Pixel.createArray("      | | |  _ < (_| | |_| | |___      ")
-        board[6] = Pixel.createArray("      |_| |_| \\_\\__, |\\___/|_____|     ")
-        board[7] = Pixel.createArray("                 |___/                 ")
+        board[2] = Pixel.createArray("  _____ ____        ___  _     _       ")
+        board[3] = Pixel.createArray(" |_   _|  _ \\ __ _ / _ \\| |   | |      ")
+        board[4] = Pixel.createArray("   | | | |_) / _` | | | | |   | |      ")
+        board[5] = Pixel.createArray("   | | |  _ < (_| | |_| | |___| |___   ")
+        board[6] = Pixel.createArray("   |_| |_| \\_\\__, |\\___/|_____|_____|   ")
+        board[7] = Pixel.createArray("              |___/                    ")
         board[8] = Pixel.createArray("                                       ")
 
         board[10] = centerText("Feature not yet implemented!")
@@ -32,15 +33,25 @@ abstract class Menu : Clickable {
     }
 
     fun display() {
-        lineToHover = 0
+        cursor = 0
         screen.updateMenuBoard(board)
     }
 
     fun markHovered() {
-        board[lineToHover].forEach { it.setBgColor("grey") }
+        board[cursor + 10].forEach { it.setBgColor("grey") }
+        board[cursor + 10].forEach { it.setColor("black") }
     }
 
     fun unmarkHovered() {
-        board[lineToHover].forEach { it.setBgColor("") }
+        board[cursor + 10].forEach { it.setBgColor("") }
+        board[cursor + 10].forEach { it.setColor("white") }
+    }
+
+    open fun reset() {
+        unmarkHovered()
+        cursor = 0
+        if (!this.children.isNullOrEmpty() && this.children.isNotEmpty()) {
+            markHovered()
+        }
     }
 }

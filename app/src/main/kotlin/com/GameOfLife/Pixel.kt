@@ -29,6 +29,14 @@ class Pixel(private var character: String, private var color: String, private va
             this.color = "\u001B[32m";
             return;
         }
+        if (color == "black") {
+            this.color = "\u001B[30m";
+            return;
+        }
+        if (color == "white") {
+            this.color = "\u001B[37m";
+            return;
+        }
         this.color = color
     }
 
