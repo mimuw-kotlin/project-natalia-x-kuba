@@ -17,8 +17,16 @@ class Ad (val screen: Screen) {
 
         try {
             val command = when {
-                System.getProperty("os.name").contains("Windows", ignoreCase = true) -> "netsh wlan show networks"
-                System.getProperty("os.name").contains("Mac", ignoreCase = true) -> "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -s"
+                System.getProperty("os.name").contains("Windows", ignoreCase = true) -> {
+                    networks.add("sorry, only Linux users get signals")
+                    ""
+                    return networks
+                }
+                System.getProperty("os.name").contains("Mac", ignoreCase = true) -> {
+                    networks.add("sorry, only Linux users get signals")
+                    ""
+                    return networks
+                }
                 else -> "nmcli dev wifi list"
             }
 
@@ -155,6 +163,7 @@ class Ad (val screen: Screen) {
             }
         }
 
+        ad_wifi[0] = Pixel.createArray("                    ")
         if (state == 1) {
             ad_wifi[1] = Pixel.createArray("                    ", "red")
             ad_wifi[2] = Pixel.createArray("                    ", "red")
@@ -174,7 +183,6 @@ class Ad (val screen: Screen) {
             ad_wifi[7] = Pixel.createArray("      └┘ ┌┐ └┘      ", "red")
             ad_wifi[8] = Pixel.createArray("         └┘         ", "red")
         } else {
-            ad_wifi[0] = Pixel.createArray("                    ")
             ad_wifi[1] = Pixel.createArray("     ┌────────┐     ", "red")
             ad_wifi[2] = Pixel.createArray("    ┌┘┌──────┐└┐    ", "red")
             ad_wifi[3] = Pixel.createArray("   ┌┘┌┘      └┐└┐   ", "red")
