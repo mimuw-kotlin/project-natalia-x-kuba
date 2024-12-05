@@ -37,6 +37,10 @@ class Pixel(private var character: String, private var color: String, private va
             this.color = "\u001B[37m";
             return;
         }
+        if (color == "blue") {
+            this.color = "\u001B[34m";
+            return;
+        }
         this.color = color
     }
 

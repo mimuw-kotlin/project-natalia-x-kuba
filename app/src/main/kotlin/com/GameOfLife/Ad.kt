@@ -55,24 +55,6 @@ class Ad (val screen: Screen) {
     }
 
 
-    fun runForThreeSeconds() {
-        val startTime = System.currentTimeMillis()
-        GlobalScope.launch {
-            while (System.currentTimeMillis() - startTime < 3000) {
-                init_wifi(1)
-                screen.changeAd(ad_wifi)
-                delay(500)
-                init_wifi(2)
-                screen.changeAd(ad_wifi)
-                delay(500)
-                init_wifi(3)
-                screen.changeAd(ad_wifi)
-                delay(500)
-            }
-        }
-    }
-
-
     /*
   ┌────────┐
  ┌┘┌──────┐└┐
@@ -169,32 +151,32 @@ class Ad (val screen: Screen) {
 
         ad_wifi[0] = Pixel.createArray("                    ")
         if (state == 1) {
-            ad_wifi[1] = Pixel.createArray("                    ", "red")
-            ad_wifi[2] = Pixel.createArray("                    ", "red")
-            ad_wifi[3] = Pixel.createArray("                    ", "red")
-            ad_wifi[4] = Pixel.createArray("                    ", "red")
-            ad_wifi[5] = Pixel.createArray("                    ", "red")
-            ad_wifi[6] = Pixel.createArray("                    ", "red")
-            ad_wifi[7] = Pixel.createArray("         ┌┐         ", "red")
-            ad_wifi[8] = Pixel.createArray("         └┘         ", "red")
+            ad_wifi[1] = Pixel.createArray("                    ", "blue")
+            ad_wifi[2] = Pixel.createArray("                    ", "blue")
+            ad_wifi[3] = Pixel.createArray("                    ", "blue")
+            ad_wifi[4] = Pixel.createArray("                    ", "blue")
+            ad_wifi[5] = Pixel.createArray("                    ", "blue")
+            ad_wifi[6] = Pixel.createArray("                    ", "blue")
+            ad_wifi[7] = Pixel.createArray("         ┌┐         ", "blue")
+            ad_wifi[8] = Pixel.createArray("         └┘         ", "blue")
         } else if (state == 2) {
-            ad_wifi[1] = Pixel.createArray("                    ", "red")
-            ad_wifi[2] = Pixel.createArray("                    ", "red")
-            ad_wifi[3] = Pixel.createArray("                    ", "red")
-            ad_wifi[4] = Pixel.createArray("       ┌────┐       ", "red")
-            ad_wifi[5] = Pixel.createArray("      ┌┘┌──┐└┐      ", "red")
-            ad_wifi[6] = Pixel.createArray("      |┌┘  └┐|      ", "red")
-            ad_wifi[7] = Pixel.createArray("      └┘ ┌┐ └┘      ", "red")
-            ad_wifi[8] = Pixel.createArray("         └┘         ", "red")
+            ad_wifi[1] = Pixel.createArray("                    ", "blue")
+            ad_wifi[2] = Pixel.createArray("                    ", "blue")
+            ad_wifi[3] = Pixel.createArray("                    ", "blue")
+            ad_wifi[4] = Pixel.createArray("       ┌────┐       ", "blue")
+            ad_wifi[5] = Pixel.createArray("      ┌┘┌──┐└┐      ", "blue")
+            ad_wifi[6] = Pixel.createArray("      |┌┘  └┐|      ", "blue")
+            ad_wifi[7] = Pixel.createArray("      └┘ ┌┐ └┘      ", "blue")
+            ad_wifi[8] = Pixel.createArray("         └┘         ", "blue")
         } else {
-            ad_wifi[1] = Pixel.createArray("     ┌────────┐     ", "red")
-            ad_wifi[2] = Pixel.createArray("    ┌┘┌──────┐└┐    ", "red")
-            ad_wifi[3] = Pixel.createArray("   ┌┘┌┘      └┐└┐   ", "red")
-            ad_wifi[4] = Pixel.createArray("   │┌┘ ┌────┐ └┐│   ", "red")
-            ad_wifi[5] = Pixel.createArray("   ││ ┌┘┌──┐└┐ ││   ", "red")
-            ad_wifi[6] = Pixel.createArray("   └┘ |┌┘  └┐| └┘   ", "red")
-            ad_wifi[7] = Pixel.createArray("      └┘ ┌┐ └┘      ", "red")
-            ad_wifi[8] = Pixel.createArray("         └┘         ", "red")
+            ad_wifi[1] = Pixel.createArray("     ┌────────┐     ", "blue")
+            ad_wifi[2] = Pixel.createArray("    ┌┘┌──────┐└┐    ", "blue")
+            ad_wifi[3] = Pixel.createArray("   ┌┘┌┘      └┐└┐   ", "blue")
+            ad_wifi[4] = Pixel.createArray("   │┌┘ ┌────┐ └┐│   ", "blue")
+            ad_wifi[5] = Pixel.createArray("   ││ ┌┘┌──┐└┐ ││   ", "blue")
+            ad_wifi[6] = Pixel.createArray("   └┘ |┌┘  └┐| └┘   ", "blue")
+            ad_wifi[7] = Pixel.createArray("      └┘ ┌┐ └┘      ", "blue")
+            ad_wifi[8] = Pixel.createArray("         └┘         ", "blue")
         }
         ad_wifi[9] = Pixel.createArray("                    ")
         ad_wifi[10] = Pixel.createArray("HOT SIGNALS IN      ")
@@ -242,7 +224,18 @@ class Ad (val screen: Screen) {
                 Thread.sleep(3000L)
                 screen.changeAd(ad_codeforia)
                 Thread.sleep(3000L)
-                runForThreeSeconds()
+
+                for (i in 0..1) {
+                    init_wifi(1)
+                    screen.changeAd(ad_wifi)
+                    Thread.sleep(500)
+                    init_wifi(2)
+                    screen.changeAd(ad_wifi)
+                    Thread.sleep(500)
+                    init_wifi(3)
+                    screen.changeAd(ad_wifi)
+                    Thread.sleep(500)
+                }
             }
         } catch (e: Exception) {
             ;
