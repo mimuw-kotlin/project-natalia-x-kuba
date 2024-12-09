@@ -1,14 +1,27 @@
-package app.src.main.kotlin.com.GameOfLife
+package com.gameOfLife
 
-import com.gameOfLife.Settings
 import java.util.concurrent.Semaphore
 
+/**
+ * The `Board` class manages the Game of Life board and updates its state based on game rules.
+ * It ensures thread-safe access to the board using a semaphore.
+ *
+ * @property screen the `Screen` object for updating the visual representation of the board.
+ */
 class Board(val screen: Screen) {
+    // 2D array representing the game board, initialized with dead cells (".")
     private var board: Array<Array<String>> = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { "." } }
-    private val board_mutext = Semaphore(1, true)
 
+    // Semaphore to manage thread-safe access to the board
+    private val boardMutext = Semaphore(1, true)
+
+    /**
+     * Toggles the state of a pixel on the board based on the current cursor position.
+     * If the cell is dead (.), it becomes alive (#), and vice versa.
+     * Updates the corresponding pixel on the screen.
+     */
     fun changeBoardPixel() {
-        board_mutext.acquire()
+        boardMutext.acquire()
         val cursor = screen.getCursor()
 
         if (board[cursor.first][cursor.second] == ".") {
@@ -17,40 +30,50 @@ class Board(val screen: Screen) {
             board[cursor.first][cursor.second] = "."
         }
 
-        board_mutext.release()
+        boardMutext.release()
         screen.updateGameBoardPixel(cursor.first, cursor.second, board[cursor.first][cursor.second])
     }
 
+    /**
+     * Calculates the new state of the board based on the Game of Life rules:
+     * - Any live cell with fewer than two live neighbors dies (underpopulation).
+     * - Any live cell with more than three live neighbors dies (overpopulation).
+     * - Any live cell with two or three live neighbors lives.
+     * - Any dead cell with exactly three live neighbors becomes alive (reproduction).
+     * Updates the screen with the new board state.
+     */
     fun calculateNewBoard() {
         var newBoard: Array<Array<String>> = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { "." } }
 
-        board_mutext.acquire()
+        boardMutext.acquire()
+
+        // Iterate through each cell on the board
         for (row in board.indices) {
             for (col in board[row].indices) {
                 val liveCount = countLiveNeighbors(row, col)
 
-                if (board[row][col] == "#" && (liveCount < 2 || liveCount > 3)) {
-                    // Any live cell with fewer than two live neighbours dies, as if by underpopulation.
-                    // Any live cell with more than three live neighbours dies, as if by overpopulation.
-                    newBoard[row][col] = "."
-                } else if (board[row][col] == "#" && (liveCount == 2 || liveCount == 3)) {
-                    // Any live cell with two or three live neighbours lives on to the next generation.
-
-                    newBoard[row][col] = "#"
-                } else if (board[row][col] == "." && liveCount == 3) {
-                    // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-                    newBoard[row][col] = "#"
-                } else {
-                    newBoard[row][col] = "."
+                // Apply Game of Life rules to determine the state of the cell
+                newBoard[row][col] = when {
+                    board[row][col] == "#" && (liveCount < 2 || liveCount > 3) -> "."
+                    board[row][col] == "#" && (liveCount == 2 || liveCount == 3) -> "#"
+                    board[row][col] == "." && liveCount == 3 -> "#"
+                    else -> "."
                 }
             }
         }
 
-        board = newBoard
-        board_mutext.release()
-        screen.updateGameBoard(board)
+        board = newBoard // Update the board with the new state
+        boardMutext.release() // Release semaphore after update
+        screen.updateGameBoard(board) // Update the screen with the new board state
     }
 
+    /**
+     * Counts the number of live neighbors surrounding a cell at the given row and column.
+     *
+     * @param row the row index of the cell.
+     * @param col the column index of the cell.
+     * @return the number of live neighbors.
+     */
     private fun countLiveNeighbors(
         row: Int,
         col: Int,
@@ -69,14 +92,17 @@ class Board(val screen: Screen) {
 
         var liveCount = 0
 
+        // Iterate through each direction to check for live neighbors
         for (direction in directions) {
             val newRow = row + direction.first
             val newCol = col + direction.second
 
+            // Skip cells that are out of bounds
             if (newRow < 0 || newRow >= Settings.ROWS || newCol < 0 || newCol >= Settings.GAME_BOARD_COLS) {
                 continue
             }
 
+            // Increment liveCount if the neighboring cell is alive ("#")
             if (board[newRow][newCol] == "#") {
                 liveCount++
             }

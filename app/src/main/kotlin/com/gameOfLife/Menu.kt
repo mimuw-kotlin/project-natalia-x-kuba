@@ -1,7 +1,6 @@
 package com.gameOfLife
 
 import app.src.main.kotlin.com.GameOfLife.Pixel
-import app.src.main.kotlin.com.GameOfLife.Screen
 
 abstract class Menu : Clickable {
     var board: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.MENU_BOARD_COLS) { Pixel(" ") } }

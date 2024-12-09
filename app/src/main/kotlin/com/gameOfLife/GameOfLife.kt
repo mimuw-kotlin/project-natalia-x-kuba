@@ -1,7 +1,5 @@
 package com.gameOfLife
 
-import app.src.main.kotlin.com.GameOfLife.*
-
 fun main() {
     val screen = Screen()
     MainMenu.screen = screen

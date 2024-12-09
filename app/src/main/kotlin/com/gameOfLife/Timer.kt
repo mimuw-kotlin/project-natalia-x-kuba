@@ -1,7 +1,5 @@
 package com.gameOfLife
 
-import app.src.main.kotlin.com.GameOfLife.Board
-import app.src.main.kotlin.com.GameOfLife.Screen
 import java.util.concurrent.Semaphore
 
 class Timer(var screen: Screen, var board: Board) {
