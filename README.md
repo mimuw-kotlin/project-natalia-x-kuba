@@ -36,3 +36,8 @@ In the second part we're going to add more features like:
 - Kotlin
 - Gradle
 - AND MANY MORE!!! 
+
+## How to use
+- Open the project-natalia-x-kuba/app folder, then run ./build-and-run
+- Once the game starts you can use the following commands to play. WASD - to move up, left, down, right; , - to slow down time; . - to speed up time; e - access and exit the menu; press the space bar to place or delete a cell
+- Once you are done with the game, press q to exit
