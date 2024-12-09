@@ -1,5 +1,4 @@
 package com.gameOfLife
-import app.src.main.kotlin.com.GameOfLife.Pixel
 import java.io.BufferedReader
 import java.io.InputStreamReader
 

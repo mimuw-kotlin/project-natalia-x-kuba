@@ -1,6 +1,5 @@
 package com.gameOfLife
 
-import app.src.main.kotlin.com.GameOfLife.Pixel
 import java.util.concurrent.Semaphore
 
 class Screen {
