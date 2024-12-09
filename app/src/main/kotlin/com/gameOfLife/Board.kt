@@ -53,12 +53,13 @@ class Board(val screen: Screen) {
                 val liveCount = countLiveNeighbors(row, col)
 
                 // Apply Game of Life rules to determine the state of the cell
-                newBoard[row][col] = when {
-                    board[row][col] == "#" && (liveCount < 2 || liveCount > 3) -> "."
-                    board[row][col] == "#" && (liveCount == 2 || liveCount == 3) -> "#"
-                    board[row][col] == "." && liveCount == 3 -> "#"
-                    else -> "."
-                }
+                newBoard[row][col] =
+                    when {
+                        board[row][col] == "#" && (liveCount < 2 || liveCount > 3) -> "."
+                        board[row][col] == "#" && (liveCount == 2 || liveCount == 3) -> "#"
+                        board[row][col] == "." && liveCount == 3 -> "#"
+                        else -> "."
+                    }
             }
         }
 
