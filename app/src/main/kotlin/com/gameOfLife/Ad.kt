@@ -17,51 +17,62 @@ object Ad {
     // List to hold multiple advertisements
     private val ads: MutableList<Array<Array<Pixel>>> = mutableListOf(adXtb, adCodeforia)
 
-    // List to hold networks on macOS
-    private val macOSNetworks: MutableList<String> = mutableListOf()
+    // List to hold networks on macOS and Linux
+    private val networks: MutableList<String> = mutableListOf()
 
     /**
      * Fetches available Wi-Fi networks on Linux systems using the `nmcli` command.
-     * On non-Linux systems, it returns a static message indicating unsupported functionality.
-     *
-     * @return a list of strings representing Wi-Fi network names and their signal strengths.
+     * On macOS, it uses the `airport` command to fetch Wi-Fi networks.
+     * On non-Unix systems, it returns a static message indicating unsupported functionality.
      */
-    private fun getWifiNetworks(): List<String> {
-        val networks = mutableListOf<String>()
-
+    private fun initWifiNetworks() {
         try {
-            val command =
-                when {
-                    System.getProperty("os.name").contains("Windows", ignoreCase = true) -> {
-                        networks.add("sorry, only Linux")
-                        networks.add("users can get")
-                        networks.add("hot signals")
-                        return networks
-                    }
-                    System.getProperty("os.name").contains("Mac", ignoreCase = true) -> {
-                        return macOSNetworks
-                    }
-                    else -> "nmcli dev wifi list"
+            when {
+                System.getProperty("os.name").contains("Windows", ignoreCase = true) -> {
+                    networks.add("sorry, only Linux")
+                    networks.add("users can get")
+                    networks.add("hot signals")
                 }
+                System.getProperty("os.name").contains("Mac", ignoreCase = true) -> {
+                    val command =
+                        arrayOf(
+                            "/bin/bash",
+                            "-c",
+                            "/System/Library/PrivateFrameworks/Apple80211.framework/Versions" +
+                                "/Current/Resources/airport -s | awk 'NR>1{print \$1}'",
+                        )
 
-            val process = ProcessBuilder(command.split(" ")).start()
-            val reader = BufferedReader(InputStreamReader(process.inputStream))
+                    val process = ProcessBuilder(*command).start()
+                    val reader = BufferedReader(InputStreamReader(process.inputStream))
 
-            reader.useLines { lines ->
-                lines.forEach { line ->
-                    if (!line.contains("SSID", ignoreCase = true) && !line.contains("--")) {
-                        val parts = line.drop(1).split(Regex("\\s{2,}")).filter { it.isNotEmpty() }
-                        val networkName = parts[1].take(6)
-                        val signalBars = parts[parts.size - 2]
-                        networks.add("$networkName $signalBars")
+                    reader.useLines { lines ->
+                        lines.forEach { line ->
+                            if (line.isNotEmpty()) {
+                                networks.add(" $line")
+                            }
+                        }
+                    }
+                }
+                else -> {
+                    val command = "nmcli dev wifi list"
+                    val process = ProcessBuilder(command.split(" ")).start()
+                    val reader = BufferedReader(InputStreamReader(process.inputStream))
+
+                    reader.useLines { lines ->
+                        lines.forEach { line ->
+                            if (!line.contains("SSID", ignoreCase = true) && !line.contains("--")) {
+                                val parts = line.drop(1).split(Regex("\\s{2,}")).filter { it.isNotEmpty() }
+                                val networkName = parts[1].take(6)
+                                val signalBars = parts[parts.size - 2]
+                                networks.add("$networkName $signalBars")
+                            }
+                        }
                     }
                 }
             }
         } catch (e: Exception) {
             println("Error while fetching Wi-Fi networks: ${e.message}")
         }
-
-        return networks
     }
 
     /**
@@ -145,9 +156,8 @@ object Ad {
      * @param state an integer determining the Wi-Fi animation state.
      */
     private fun initWifi(state: Int) {
-        val networks = getWifiNetworks()
         val lines =
-            List(6) { index ->
+            MutableList(6) { index ->
                 if (index < networks.size) {
                     val network = networks[index]
                     if (network.length > 20) {
@@ -160,6 +170,9 @@ object Ad {
                 }
             }
 
+        if (lines[0] == " ".repeat(20)) {
+            lines[0] = "Weird... no Wi-Fi?"
+        }
         adWifi[0] = Pixel.createArray("                    ")
         if (state == 1) {
             adWifi[1] = Pixel.createArray("                    ", "blue")
@@ -231,26 +244,7 @@ object Ad {
         initXtb()
         initCodeforia()
 
-        if (System.getProperty("os.name").contains("Mac", ignoreCase = true)) {
-            val command =
-                arrayOf(
-                    "/bin/bash",
-                    "-c",
-                    "/System/Library/PrivateFrameworks/Apple80211.framework/Versions" +
-                        "/Current/Resources/airport -s | awk 'NR>1{print \$1}'",
-                )
-
-            val process = ProcessBuilder(*command).start()
-            val reader = BufferedReader(InputStreamReader(process.inputStream))
-
-            reader.useLines { lines ->
-                lines.forEach { line ->
-                    if (line.isNotEmpty()) {
-                        macOSNetworks.add(" $line")
-                    }
-                }
-            }
-        }
+        initWifiNetworks()
         Thread.sleep(1000)
     }
 
