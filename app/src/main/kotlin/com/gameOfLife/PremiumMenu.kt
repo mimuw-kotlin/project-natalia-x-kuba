@@ -39,7 +39,7 @@ object PremiumMenu : Menu() {
                  */
                 override fun query(key: Char) {
                     MainMenu.currentMenu = this.parent!!
-                    screen.setMenu(MainMenu.currentMenu)
+                    Screen.setMenu(MainMenu.currentMenu)
                 }
             },
         )

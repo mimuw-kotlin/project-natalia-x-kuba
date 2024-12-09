@@ -6,7 +6,7 @@ import java.util.concurrent.Semaphore
  * The `Screen` class manages the visual aspects of the game, such as updating the game board, handling the menu,
  * managing the cursor, and displaying the screen output. It controls the display of both the game and menu states.
  */
-class Screen {
+object Screen {
     private var time = 0
     private var speed = 1
     private var cursor = Pair(0, 0)

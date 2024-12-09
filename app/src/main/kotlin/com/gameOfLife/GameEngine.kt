@@ -3,12 +3,10 @@ package com.gameOfLife
 import java.util.concurrent.Semaphore
 
 /**
- * The `Board` class manages the Game of Life board and updates its state based on game rules.
+ * The `GameEngine` class manages the Game of Life board and updates its state based on game rules.
  * It ensures thread-safe access to the board using a semaphore.
- *
- * @property screen the `Screen` object for updating the visual representation of the board.
  */
-class Board(val screen: Screen) {
+object GameEngine {
     // 2D array representing the game board, initialized with dead cells (".")
     private var board: Array<Array<String>> = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { "." } }
 
@@ -22,7 +20,7 @@ class Board(val screen: Screen) {
      */
     fun changeBoardPixel() {
         boardMutext.acquire()
-        val cursor = screen.getCursor()
+        val cursor = Screen.getCursor()
 
         if (board[cursor.first][cursor.second] == ".") {
             board[cursor.first][cursor.second] = "#"
@@ -31,7 +29,7 @@ class Board(val screen: Screen) {
         }
 
         boardMutext.release()
-        screen.updateGameBoardPixel(cursor.first, cursor.second, board[cursor.first][cursor.second])
+        Screen.updateGameBoardPixel(cursor.first, cursor.second, board[cursor.first][cursor.second])
     }
 
     /**
@@ -65,7 +63,7 @@ class Board(val screen: Screen) {
 
         board = newBoard // Update the board with the new state
         boardMutext.release() // Release semaphore after update
-        screen.updateGameBoard(board) // Update the screen with the new board state
+        Screen.updateGameBoard(board) // Update the screen with the new board state
     }
 
     /**

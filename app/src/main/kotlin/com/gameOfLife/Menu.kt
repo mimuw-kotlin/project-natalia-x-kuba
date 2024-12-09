@@ -8,9 +8,6 @@ abstract class Menu : Clickable {
     // An array of Clickable elements (submenus or other options in the menu)
     abstract var children: Array<Clickable>
 
-    // The screen object that interacts with the UI
-    lateinit var screen: Screen
-
     // The index of the currently selected item (menu option)
     protected var cursor: Int = 0
 
@@ -56,7 +53,7 @@ abstract class Menu : Clickable {
      */
     fun display() {
         cursor = 0
-        screen.updateMenuBoard(board) // Update the screen with the current menu board
+        Screen.updateMenuBoard(board) // Update the screen with the current menu board
     }
 
     /**

@@ -43,14 +43,14 @@ object MainMenu : Menu() {
                 unmarkHovered()
                 cursor = (cursor - 1 + children.size) % children.size
                 markHovered()
-                screen.updateMenuBoard(board)
+                Screen.updateMenuBoard(board)
             }
             // Move the cursor down through the options
             's' -> {
                 unmarkHovered()
                 cursor = (cursor + 1) % children.size
                 markHovered()
-                screen.updateMenuBoard(board)
+                Screen.updateMenuBoard(board)
             }
             // Select the current hovered option
             ' ' -> {
@@ -58,7 +58,7 @@ object MainMenu : Menu() {
                 if (children[cursor] is Menu) {
                     currentMenu = children[cursor] as Menu
                     children[cursor].parent = this
-                    screen.setMenu(currentMenu)
+                    Screen.setMenu(currentMenu)
                 } else {
                     children[cursor].query(' ')
                 }

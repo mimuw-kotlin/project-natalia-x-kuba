@@ -6,11 +6,8 @@ import java.util.concurrent.Semaphore
  * The `Timer` class is responsible for managing the in-game time and controlling the speed of the game.
  * It handles the time increments, updates the game state at each tick, and adjusts the game speed.
  * The `run` method continuously updates the game state based on the current speed.
- *
- * @param screen The [Screen] object responsible for displaying the game's visuals, including time, speed, and game board.
- * @param board The [Board] object that holds and updates the state of the game board based on the game rules.
  */
-class Timer(var screen: Screen, var board: Board) {
+object Timer {
     private var localTime = 0 // Tracks the local time in the game (in seconds)
     private var speed = 1 // Game speed, determines how fast the game progresses (range: 0-5)
     private val sleep = Semaphore(1, true) // Semaphore to control game pause state (sleeping when speed is 0)
@@ -33,7 +30,7 @@ class Timer(var screen: Screen, var board: Board) {
         }
 
         mutex.release()
-        screen.updateSpeed(speed)
+        Screen.updateSpeed(speed)
     }
 
     /**
@@ -55,7 +52,7 @@ class Timer(var screen: Screen, var board: Board) {
         } else {
             mutex.release()
         }
-        screen.updateSpeed(speed)
+        Screen.updateSpeed(speed)
     }
 
     /**
@@ -80,8 +77,8 @@ class Timer(var screen: Screen, var board: Board) {
 
                 mutex.acquire() // Acquire mutex before modifying the time and game state
                 localTime += 1 // Increment the local game time
-                screen.updateTime(localTime) // Update the screen with the new time
-                board.calculateNewBoard() // Calculate and update the board based on the rules of the game
+                Screen.updateTime(localTime) // Update the screen with the new time
+                GameEngine.calculateNewBoard() // Calculate and update the board based on the rules of the game
                 sleep.release() // Allow the game to run at the current speed again
                 mutex.release() // Release the mutex
             }

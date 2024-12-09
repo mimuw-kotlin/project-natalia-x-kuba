@@ -1,26 +1,16 @@
 package com.gameOfLife
 
 fun main() {
-    // Create a Screen object to manage the display
-    val screen = Screen()
-
-    // Set the screen for both MainMenu and PremiumMenu to allow them to interact with the same screen
-    MainMenu.screen = screen
-    PremiumMenu.screen = screen
-
     // Initialize the main menu, game board, timer, and advertisements
     val menu = MainMenu
-    val gameBoard = Board(screen)
-    val timer = Timer(screen, gameBoard)
-    val ad = Ad(screen)
 
     // Initialize two background threads for the timer and ads, ensuring they run concurrently
-    val threadTimer = Thread { timer.run() }
-    val threadAd = Thread { ad.run() }
+    val threadTimer = Thread { Timer.run() }
+    val threadAd = Thread { Ad.run() }
 
     // Initialize and update the screen before entering the main loop
-    screen.initScreen()
-    screen.updateScreen()
+    Screen.initScreen()
+    Screen.updateScreen()
 
     try {
         // Start both background threads (timer and ads)
@@ -41,19 +31,19 @@ fun main() {
             if (gameOrMenu == "game") {
                 when (key) {
                     // Movement commands for the game cursor
-                    'w' -> screen.moveCursor("UP")
-                    's' -> screen.moveCursor("DOWN")
-                    'a' -> screen.moveCursor("LEFT")
-                    'd' -> screen.moveCursor("RIGHT")
+                    'w' -> Screen.moveCursor("UP")
+                    's' -> Screen.moveCursor("DOWN")
+                    'a' -> Screen.moveCursor("LEFT")
+                    'd' -> Screen.moveCursor("RIGHT")
                     // Change the state of the selected cell on the game board
-                    ' ' -> gameBoard.changeBoardPixel()
+                    ' ' -> GameEngine.changeBoardPixel()
                     // Adjust the game speed
-                    ',' -> timer.decreaseSpeed()
-                    '.' -> timer.increaseSpeed()
+                    ',' -> Timer.decreaseSpeed()
+                    '.' -> Timer.increaseSpeed()
                     // Switch to the menu state
                     'e' -> {
                         gameOrMenu = "menu"
-                        screen.switchGameOrMenu()
+                        Screen.switchGameOrMenu()
                     }
                     // Exit the program
                     'q' -> break
@@ -63,7 +53,7 @@ fun main() {
                     // Switch back to the game state
                     'e' -> {
                         gameOrMenu = "game"
-                        screen.switchGameOrMenu()
+                        Screen.switchGameOrMenu()
                     }
                     // Exit the program
                     'q' -> break
@@ -84,6 +74,6 @@ fun main() {
         Runtime.getRuntime().exec(arrayOf("/bin/sh", "-c", "stty -raw echo < /dev/tty")).waitFor()
 
         // Perform any necessary cleanup on the screen
-        screen.exitScreen()
+        Screen.exitScreen()
     }
 }

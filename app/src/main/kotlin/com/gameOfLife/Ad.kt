@@ -3,21 +3,19 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 
 /**
- * The `Ad` class manages pixel-based advertisements to be displayed on a screen.
+ * The `Ad` object manages pixel-based advertisements to be displayed on a screen.
  * It initializes and updates different types of ads, fetches dynamic Wi-Fi network data
  * for use in ads, and cycles through ads in a loop with animations.
- *
- * @property screen the `Screen` object where the ads will be displayed.
  */
-class Ad(val screen: Screen) {
+object Ad {
     // 2D array representing a predefined advertisement
-    private var ad1: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
+    private var adLame: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
     private var adXtb: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
     private var adWifi: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
     private var adCodeforia: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
 
     // List to hold multiple advertisements
-    private val ads: MutableList<Array<Array<Pixel>>> = mutableListOf(adXtb, adCodeforia, ad1)
+    private val ads: MutableList<Array<Array<Pixel>>> = mutableListOf(adXtb, adCodeforia, adLame)
 
     /**
      * Fetches available Wi-Fi networks on Linux systems using the `nmcli` command.
@@ -57,7 +55,7 @@ class Ad(val screen: Screen) {
                         val parts = line.drop(1).split(Regex("\\s{2,}")).filter { it.isNotEmpty() }
                         val networkName = parts[1].take(6)
                         val signalBars = parts[parts.size - 2]
-                        networks.add(networkName + " " + signalBars)
+                        networks.add("$networkName $signalBars")
                     }
                 }
             }
@@ -206,30 +204,34 @@ class Ad(val screen: Screen) {
         adWifi[19] = Pixel.createArray("                    ")
     }
 
+    private fun initLame() {
+        adLame[0] = Pixel.createArray("     .-''''''-.     ")
+        adLame[1] = Pixel.createArray("   .'          '.   ")
+        adLame[2] = Pixel.createArray("  /   O      O   \\  ")
+        adLame[3] = Pixel.createArray(" :                : ")
+        adLame[4] = Pixel.createArray(" |                | ")
+        adLame[5] = Pixel.createArray(" : ',          ,' : ")
+        adLame[6] = Pixel.createArray("  \\  '-......-'  /  ")
+        adLame[7] = Pixel.createArray("   '.          .'   ")
+        adLame[8] = Pixel.createArray("     '-......-'     ")
+        adLame[9] = Pixel.createArray("         |          ")
+        adLame[10] = Pixel.createArray("        |           ")
+        adLame[11] = Pixel.createArray("        |           ")
+        adLame[12] = Pixel.createArray("        |           ")
+        adLame[13] = Pixel.createArray("        |           ")
+        adLame[14] = Pixel.createArray("        |           ")
+        adLame[15] = Pixel.createArray("        |           ")
+        adLame[16] = Pixel.createArray("        |           ")
+        adLame[17] = Pixel.createArray("        |           ")
+        adLame[18] = Pixel.createArray("        |           ")
+        adLame[19] = Pixel.createArray("        |           ")
+    }
+
     init {
         initXtb()
         initCodeforia()
         initWifi(1)
-        ad1[0] = Pixel.createArray("     .-''''''-.     ")
-        ad1[1] = Pixel.createArray("   .'          '.   ")
-        ad1[2] = Pixel.createArray("  /   O      O   \\  ")
-        ad1[3] = Pixel.createArray(" :                : ")
-        ad1[4] = Pixel.createArray(" |                | ")
-        ad1[5] = Pixel.createArray(" : ',          ,' : ")
-        ad1[6] = Pixel.createArray("  \\  '-......-'  /  ")
-        ad1[7] = Pixel.createArray("   '.          .'   ")
-        ad1[8] = Pixel.createArray("     '-......-'     ")
-        ad1[9] = Pixel.createArray("         |          ")
-        ad1[10] = Pixel.createArray("        |           ")
-        ad1[11] = Pixel.createArray("        |           ")
-        ad1[12] = Pixel.createArray("        |           ")
-        ad1[13] = Pixel.createArray("        |           ")
-        ad1[14] = Pixel.createArray("        |           ")
-        ad1[15] = Pixel.createArray("        |           ")
-        ad1[16] = Pixel.createArray("        |           ")
-        ad1[17] = Pixel.createArray("        |           ")
-        ad1[18] = Pixel.createArray("        |           ")
-        ad1[19] = Pixel.createArray("        |           ")
+        initLame()
     }
 
     /**
@@ -240,24 +242,24 @@ class Ad(val screen: Screen) {
             while (true) {
                 // Cycle through the ads in the list
                 for (ad in ads) {
-                    screen.changeAd(ad)
+                    Screen.changeAd(ad)
                     Thread.sleep(3000L)
                 }
 
                 // Show animated Wi-Fi ad
                 for (i in 0..1) {
                     initWifi(1)
-                    screen.changeAd(adWifi)
+                    Screen.changeAd(adWifi)
                     Thread.sleep(500)
                     initWifi(2)
-                    screen.changeAd(adWifi)
+                    Screen.changeAd(adWifi)
                     Thread.sleep(500)
                     initWifi(3)
-                    screen.changeAd(adWifi)
+                    Screen.changeAd(adWifi)
                     Thread.sleep(500)
                 }
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
         }
     }
 }
