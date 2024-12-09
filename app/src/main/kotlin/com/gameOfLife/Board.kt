@@ -1,11 +1,11 @@
 package app.src.main.kotlin.com.GameOfLife
 
-import com.GameOfLife.Settings
+import com.gameOfLife.Settings
 import java.util.concurrent.Semaphore
 
-class Board(val screen: Screen){
+class Board(val screen: Screen) {
     private var board: Array<Array<String>> = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { "." } }
-    private val board_mutext =  Semaphore(1, true)
+    private val board_mutext = Semaphore(1, true)
 
     fun changeBoardPixel() {
         board_mutext.acquire()
@@ -51,12 +51,21 @@ class Board(val screen: Screen){
         screen.updateGameBoard(board)
     }
 
-    private fun countLiveNeighbors(row: Int, col: Int): Int {
-        val directions = listOf(
-            Pair(-1, -1), Pair(-1, 0), Pair(-1, 1),
-            Pair(0, -1), Pair(0, 1),
-            Pair(1, -1), Pair(1, 0), Pair(1, 1)
-        )
+    private fun countLiveNeighbors(
+        row: Int,
+        col: Int,
+    ): Int {
+        val directions =
+            listOf(
+                Pair(-1, -1),
+                Pair(-1, 0),
+                Pair(-1, 1),
+                Pair(0, -1),
+                Pair(0, 1),
+                Pair(1, -1),
+                Pair(1, 0),
+                Pair(1, 1),
+            )
 
         var liveCount = 0
 

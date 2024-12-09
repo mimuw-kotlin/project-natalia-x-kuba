@@ -1,7 +1,7 @@
-package app.src.main.kotlin.com.GameOfLife
+package com.gameOfLife
 
-import com.GameOfLife.Clickable
-import com.GameOfLife.Settings
+import app.src.main.kotlin.com.GameOfLife.Pixel
+import app.src.main.kotlin.com.GameOfLife.Screen
 
 abstract class Menu : Clickable {
     var board: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.MENU_BOARD_COLS) { Pixel(" ") } }
@@ -26,7 +26,10 @@ abstract class Menu : Clickable {
         board[12] = centerText("Consider donating!")
     }
 
-    fun centerText(text: String, leftPadding: Int = 0): Array<Pixel> {
+    fun centerText(
+        text: String,
+        leftPadding: Int = 0,
+    ): Array<Pixel> {
         val space = Settings.MENU_BOARD_COLS - text.length - leftPadding
         val leftSpace = space / 2
         return Pixel.createArray(" ".repeat(leftPadding + leftSpace) + text + " ".repeat(space - leftSpace))

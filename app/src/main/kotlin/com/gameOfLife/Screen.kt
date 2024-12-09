@@ -1,6 +1,8 @@
 package app.src.main.kotlin.com.GameOfLife
 
-import com.GameOfLife.Settings
+import com.gameOfLife.MainMenu
+import com.gameOfLife.Menu
+import com.gameOfLife.Settings
 import java.util.concurrent.Semaphore
 
 class Screen {
@@ -9,12 +11,11 @@ class Screen {
     private var cursor = Pair(0, 0)
     private var game_board = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { Pixel(".") } }
     private var menu_board = Array(Settings.ROWS) { Array(Settings.MENU_BOARD_COLS) { Pixel("?") } }
-    private var game_or_menu  = "game"
+    private var game_or_menu = "game"
     private var ad = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
 
     private val mutex = Semaphore(1, true)
     private var menu: Menu = MainMenu
-
 
     public fun initScreen() {
         mutex.acquire()
@@ -26,7 +27,6 @@ class Screen {
 
         mutex.release()
     }
-
 
     public fun moveCursor(direction: String) {
         mutex.acquire()
@@ -44,7 +44,6 @@ class Screen {
         this.updateScreen()
     }
 
-
     public fun exitScreen() {
         mutex.acquire()
         print("\u001B[2J")
@@ -56,7 +55,6 @@ class Screen {
         print("\u001B[?25h")
         mutex.release()
     }
-
 
     public fun updateScreen() {
         mutex.acquire()
@@ -100,7 +98,6 @@ class Screen {
         mutex.release()
     }
 
-
     private fun getTime(): String {
         val loc_time = time
         val hours = loc_time / 3600
@@ -108,7 +105,6 @@ class Screen {
         val seconds = loc_time % 60
         return String.format("%02d:%02d:%02d", hours, minutes, seconds)
     }
-
 
     private fun getSpeed(): String {
         return when (speed) {
@@ -122,22 +118,18 @@ class Screen {
         }
     }
 
-
     public fun getCursor(): Pair<Int, Int> {
         return cursor
     }
-
 
     public fun updateTime(time: Int) {
         mutex.acquire()
 
         this.time = time
 
-
         mutex.release()
         this.updateScreen()
     }
-
 
     public fun updateSpeed(speed: Int) {
         mutex.acquire()
@@ -148,7 +140,6 @@ class Screen {
         this.updateScreen()
     }
 
-
     public fun changeAd(ad: Array<Array<Pixel>>) {
         mutex.acquire()
 
@@ -158,8 +149,11 @@ class Screen {
         this.updateScreen()
     }
 
-
-    public fun updateGameBoardPixel(x: Int, y: Int, value: String) {
+    public fun updateGameBoardPixel(
+        x: Int,
+        y: Int,
+        value: String,
+    ) {
         mutex.acquire()
 
         game_board[x][y].setCharacter(value)
@@ -167,7 +161,6 @@ class Screen {
         mutex.release()
         this.updateScreen()
     }
-
 
     public fun updateGameBoard(board: Array<Array<String>>) {
         mutex.acquire()
@@ -182,7 +175,6 @@ class Screen {
         this.updateScreen()
     }
 
-
     public fun updateMenuBoard(board: Array<Array<Pixel>>) {
         mutex.acquire()
 
@@ -195,7 +187,6 @@ class Screen {
         mutex.release()
         this.updateScreen()
     }
-
 
     public fun switchGameOrMenu() {
         mutex.acquire()

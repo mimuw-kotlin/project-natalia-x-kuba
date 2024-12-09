@@ -1,8 +1,10 @@
-package app.src.main.kotlin.com.GameOfLife
+package com.gameOfLife
 
+import app.src.main.kotlin.com.GameOfLife.Board
+import app.src.main.kotlin.com.GameOfLife.Screen
 import java.util.concurrent.Semaphore
 
-class Timer (var screen: Screen, var board: Board) {
+class Timer(var screen: Screen, var board: Board) {
     private var localTime = 0
     private var speed = 1
     private val sleep = Semaphore(1, true)
@@ -42,7 +44,7 @@ class Timer (var screen: Screen, var board: Board) {
         screen.updateSpeed(speed)
     }
 
-    fun run () {
+    fun run() {
         try {
             while (true) {
                 mutex.acquire()
@@ -52,7 +54,7 @@ class Timer (var screen: Screen, var board: Board) {
                     mutex.acquire()
                 }
                 mutex.release()
-                Thread.sleep(1000L / speed)         // FIXME: This is not the correct way to implement a timer
+                Thread.sleep(1000L / speed) // FIXME: This is not the correct way to implement a timer
                 mutex.acquire()
                 localTime += 1
                 screen.updateTime(localTime)
@@ -60,9 +62,7 @@ class Timer (var screen: Screen, var board: Board) {
                 sleep.release()
                 mutex.release()
             }
-        }
-        catch (ignored: InterruptedException) {
-            ;
+        } catch (ignored: InterruptedException) {
         }
     }
 }

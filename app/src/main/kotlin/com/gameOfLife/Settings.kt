@@ -1,4 +1,4 @@
-package com.GameOfLife
+package com.gameOfLife
 
 object Settings {
     const val ROWS = 20

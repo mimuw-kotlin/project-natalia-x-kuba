@@ -22,32 +22,32 @@ class Pixel(private var character: String, private var color: String, private va
 
     public fun setColor(color: String) {
         if (color == "red") {
-            this.color = "\u001B[31m";
-            return;
+            this.color = "\u001B[31m"
+            return
         }
         if (color == "green") {
-            this.color = "\u001B[32m";
-            return;
+            this.color = "\u001B[32m"
+            return
         }
         if (color == "black") {
-            this.color = "\u001B[30m";
-            return;
+            this.color = "\u001B[30m"
+            return
         }
         if (color == "white") {
-            this.color = "\u001B[37m";
-            return;
+            this.color = "\u001B[37m"
+            return
         }
         if (color == "blue") {
-            this.color = "\u001B[34m";
-            return;
+            this.color = "\u001B[34m"
+            return
         }
         this.color = color
     }
 
     public fun setBgColor(bgColor: String) {
         if (bgColor == "grey") {
-            this.bgColor = "\u001B[48;5;250m";
-            return;
+            this.bgColor = "\u001B[48;5;250m"
+            return
         }
         this.bgColor = bgColor
     }
@@ -56,7 +56,11 @@ class Pixel(private var character: String, private var color: String, private va
         fun createArray(line: String): Array<Pixel> {
             return Array(line.length) { Pixel(line[it].toString()) }
         }
-        fun createArray(line: String, color: String): Array<Pixel> {
+
+        fun createArray(
+            line: String,
+            color: String,
+        ): Array<Pixel> {
             return Array(line.length) { Pixel(line[it].toString(), color) }
         }
     }

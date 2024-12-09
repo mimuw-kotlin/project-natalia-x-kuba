@@ -1,29 +1,27 @@
-package com.GameOfLife
+package com.gameOfLife
 
 import app.src.main.kotlin.com.GameOfLife.*
-import java.io.Console
-import java.util.concurrent.Semaphore
-import kotlin.concurrent.thread
 
-
-fun main(args: Array<String>) {
+fun main() {
     val screen = Screen()
     MainMenu.screen = screen
     PremiumMenu.screen = screen
+
     val menu = MainMenu
     val gameBoard = Board(screen)
     val timer = Timer(screen, gameBoard)
     val ad = Ad(screen)
 
-    val thread_timer = Thread { timer.run() }
-    val thread_ad = Thread { ad.run() }
+    // Initialize the threads running in the background
+    val threadTimer = Thread { timer.run() }
+    val threadAd = Thread { ad.run() }
 
     screen.initScreen()
     screen.updateScreen()
 
     try {
-        thread_timer.start()
-        thread_ad.start()
+        threadTimer.start()
+        threadAd.start()
         Runtime.getRuntime().exec(arrayOf("/bin/sh", "-c", "stty raw -echo < /dev/tty")).waitFor()
 
         var gameOrMenu = "game"
@@ -39,15 +37,17 @@ fun main(args: Array<String>) {
                     ',' -> timer.decreaseSpeed()
                     '.' -> timer.increaseSpeed()
                     'e' -> {
-                        gameOrMenu = "menu"; screen.switchGameOrMenu()
+                        gameOrMenu = "menu"
+                        screen.switchGameOrMenu()
                     }
 
                     'q' -> break
                 }
-            } else if (gameOrMenu == "menu") {
+            } else { // gameOrMenu == "menu"
                 when (key) {
                     'e' -> {
-                        gameOrMenu = "game"; screen.switchGameOrMenu()
+                        gameOrMenu = "game"
+                        screen.switchGameOrMenu()
                     }
                     'q' -> break
                     else -> menu.query(key)
@@ -57,10 +57,9 @@ fun main(args: Array<String>) {
     } catch (e: Exception) {
         println("Error: ${e.message}")
     } finally {
-        thread_timer.interrupt()
-        thread_ad.interrupt()
+        threadTimer.interrupt()
+        threadAd.interrupt()
         Runtime.getRuntime().exec(arrayOf("/bin/sh", "-c", "stty -raw echo < /dev/tty")).waitFor()
         screen.exitScreen()
     }
 }
-
