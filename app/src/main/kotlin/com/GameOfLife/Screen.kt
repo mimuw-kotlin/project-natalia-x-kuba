@@ -47,6 +47,8 @@ class Screen {
 
     public fun exitScreen() {
         mutex.acquire()
+        print("\u001B[2J")
+        print("\u001B[H")
         repeat(Settings.ROWS + 3) { print("\r\u001b[1A") }
         print("\u001b[2K")
         println("\rThank you for playing!!")
