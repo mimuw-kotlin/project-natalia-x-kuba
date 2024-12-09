@@ -15,7 +15,10 @@ object Ad {
     private var adCodeforia: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
 
     // List to hold multiple advertisements
-    private val ads: MutableList<Array<Array<Pixel>>> = mutableListOf(adXtb, adCodeforia, adLame)
+    private val ads: MutableList<Array<Array<Pixel>>> = mutableListOf(adXtb, adCodeforia)
+
+    // List to hold networks on macOS
+    private val macOSNetworks: MutableList<String> = mutableListOf()
 
     /**
      * Fetches available Wi-Fi networks on Linux systems using the `nmcli` command.
@@ -33,15 +36,10 @@ object Ad {
                         networks.add("sorry, only Linux")
                         networks.add("users can get")
                         networks.add("hot signals")
-                        ""
                         return networks
                     }
                     System.getProperty("os.name").contains("Mac", ignoreCase = true) -> {
-                        networks.add("sorry, only Linux")
-                        networks.add("users can get")
-                        networks.add("hot signals")
-                        ""
-                        return networks
+                        return macOSNetworks
                     }
                     else -> "nmcli dev wifi list"
                 }
@@ -222,16 +220,38 @@ object Ad {
         adLame[14] = Pixel.createArray("        |           ")
         adLame[15] = Pixel.createArray("        |           ")
         adLame[16] = Pixel.createArray("        |           ")
-        adLame[17] = Pixel.createArray("        |           ")
-        adLame[18] = Pixel.createArray("        |           ")
-        adLame[19] = Pixel.createArray("        |           ")
+        adLame[17] = Pixel.createArray("                    ")
+        adLame[18] = Pixel.createArray("   Loading ads...   ")
+        adLame[19] = Pixel.createArray("                    ")
     }
 
     init {
+        initLame()
+        Screen.changeAd(adLame)
         initXtb()
         initCodeforia()
-        initWifi(1)
-        initLame()
+
+        if (System.getProperty("os.name").contains("Mac", ignoreCase = true)) {
+            val command =
+                arrayOf(
+                    "/bin/bash",
+                    "-c",
+                    "/System/Library/PrivateFrameworks/Apple80211.framework/Versions" +
+                        "/Current/Resources/airport -s | awk 'NR>1{print \$1}'",
+                )
+
+            val process = ProcessBuilder(*command).start()
+            val reader = BufferedReader(InputStreamReader(process.inputStream))
+
+            reader.useLines { lines ->
+                lines.forEach { line ->
+                    if (line.isNotEmpty()) {
+                        macOSNetworks.add(" $line")
+                    }
+                }
+            }
+        }
+        Thread.sleep(1000)
     }
 
     /**
