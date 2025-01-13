@@ -4,7 +4,7 @@ import com.gameOfLife.Settings
 import java.io.File
 
 class AdFrame(filePath: String) {
-    private val pixels: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
+    private val pixels: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel('$') } }
 
     init {
         try {
@@ -17,10 +17,10 @@ class AdFrame(filePath: String) {
             for (row in 0 until Settings.ROWS) {
                 val line = lines[row]
                 for (col in 0 until line.length) {
-                    pixels[row][col] = Pixel(line[col].toString(), "white")
+                    pixels[row][col] = Pixel(line[col], "white")
                 }
                 for (col in line.length until Settings.AD_COLS) {
-                    pixels[row][col] = Pixel(" ", "white")
+                    pixels[row][col] = Pixel(' ', "white")
                 }
             }
 

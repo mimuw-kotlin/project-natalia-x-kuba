@@ -1,9 +1,13 @@
-package com.gameOfLife
+package com.gameOfLife.menu
+
+import com.gameOfLife.Pixel
+import com.gameOfLife.Screen
+import com.gameOfLife.Settings
 
 // Abstract class representing a Menu, which implements Clickable
 abstract class Menu : Clickable {
     // 2D array representing the board where the menu items are drawn
-    var board: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.MENU_BOARD_COLS) { Pixel(" ") } }
+    var board: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.MENU_BOARD_COLS) { Pixel(' ') } }
 
     // An array of Clickable elements (submenus or other options in the menu)
     abstract var children: Array<Clickable>
@@ -23,10 +27,6 @@ abstract class Menu : Clickable {
         board[6] = Pixel.createArray("   |_| |_| \\_\\__, |\\___/|_____|_____|   ")
         board[7] = Pixel.createArray("              |___/                    ")
         board[8] = Pixel.createArray("                                       ")
-
-        // Displaying feature not yet implemented text and donation request text
-        board[10] = centerText("Feature not yet implemented!")
-        board[12] = centerText("Consider donating!")
     }
 
     /**

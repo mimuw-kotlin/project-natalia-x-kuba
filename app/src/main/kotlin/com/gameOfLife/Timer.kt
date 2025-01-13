@@ -18,19 +18,23 @@ object Timer {
      * When speed is increased, the game updates the displayed speed and releases any pause state.
      */
     fun increaseSpeed() {
-        mutex.acquire() // Acquire mutex to ensure thread safety
+        try {
+            mutex.acquire() // Acquire mutex to ensure thread safety
 
-        if (speed == 5) {
+            if (speed == 5) {
+                mutex.release()
+                return
+            }
+            speed += 1
+            if (speed == 1) {
+                sleep.release() // Release sleep semaphore if the speed increases from 0 to 1; unpause the game,
+            }
+
             mutex.release()
-            return
+            Screen.updateSpeed(speed)
+        } catch (ignored: InterruptedException) {
+            // Handle InterruptedException if the thread is interrupted
         }
-        speed += 1
-        if (speed == 1) {
-            sleep.release() // Release sleep semaphore if the speed increases from 0 to 1; unpause the game,
-        }
-
-        mutex.release()
-        Screen.updateSpeed(speed)
     }
 
     /**
@@ -38,21 +42,25 @@ object Timer {
      * When speed is decreased, the game updates the displayed speed and pauses if necessary.
      */
     fun decreaseSpeed() {
-        mutex.acquire()
-        if (speed == 0) {
-            mutex.release()
-            return
-        }
+        try {
+            mutex.acquire()
+            if (speed == 0) {
+                mutex.release()
+                return
+            }
 
-        speed -= 1
+            speed -= 1
 
-        if (speed == 0) {
-            mutex.release()
-            sleep.acquire() // Pause the game.
-        } else {
-            mutex.release()
+            if (speed == 0) {
+                mutex.release()
+                sleep.acquire() // Pause the game.
+            } else {
+                mutex.release()
+            }
+            Screen.updateSpeed(speed)
+        } catch (ignored: InterruptedException) {
+            // Handle InterruptedException if the thread is interrupted
         }
-        Screen.updateSpeed(speed)
     }
 
     /**

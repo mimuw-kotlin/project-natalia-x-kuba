@@ -1,5 +1,7 @@
 package com.gameOfLife
 
+import com.gameOfLife.menu.MainMenu
+import com.gameOfLife.menu.Menu
 import java.util.concurrent.Semaphore
 
 /**
@@ -10,10 +12,10 @@ object Screen {
     private var time = 0
     private var speed = 1
     private var cursor = Pair(0, 0)
-    private var gameBoard = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { Pixel(".") } }
-    private var menuBoard = Array(Settings.ROWS) { Array(Settings.MENU_BOARD_COLS) { Pixel("?") } }
-    private var gameOrMenu = "game"
-    private var ad = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel("$") } }
+    private var gameBoard = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { Pixel(Settings.getCellStateChar(CellState.DEAD)) } }
+    private var menuBoard = Array(Settings.ROWS) { Array(Settings.MENU_BOARD_COLS) { Pixel('?') } }
+    private var gameOrMenu = GameOrMenu.GAME
+    private var ad = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel('$') } }
 
     private val mutex = Semaphore(1, true)
     private var menu: Menu = MainMenu
@@ -43,7 +45,7 @@ object Screen {
      *
      * @param direction The direction to move the cursor. It can be "UP", "DOWN", "LEFT", or "RIGHT".
      */
-    public fun moveCursor(direction: String) {
+    public fun moveCursor(direction: Action) {
         mutex.acquire()
 
         // Remove grey background from the current cursor position
@@ -51,10 +53,11 @@ object Screen {
 
         // Update cursor position based on direction
         when (direction) {
-            "UP" -> cursor = Pair((cursor.first - 1 + Settings.ROWS) % Settings.ROWS, cursor.second)
-            "DOWN" -> cursor = Pair((cursor.first + 1) % Settings.ROWS, cursor.second)
-            "LEFT" -> cursor = Pair(cursor.first, (cursor.second - 1 + Settings.GAME_BOARD_COLS) % Settings.GAME_BOARD_COLS)
-            "RIGHT" -> cursor = Pair(cursor.first, (cursor.second + 1) % Settings.GAME_BOARD_COLS)
+            Action.UP -> cursor = Pair((cursor.first - 1 + Settings.ROWS) % Settings.ROWS, cursor.second)
+            Action.DOWN -> cursor = Pair((cursor.first + 1) % Settings.ROWS, cursor.second)
+            Action.LEFT -> cursor = Pair(cursor.first, (cursor.second - 1 + Settings.GAME_BOARD_COLS) % Settings.GAME_BOARD_COLS)
+            Action.RIGHT -> cursor = Pair(cursor.first, (cursor.second + 1) % Settings.GAME_BOARD_COLS)
+            else -> {}
         }
 
         // Set the new position of the cursor with grey background
@@ -110,14 +113,14 @@ object Screen {
             }
 
             print("|")
-            if (gameOrMenu == "game") {
+            if (gameOrMenu == GameOrMenu.GAME) {
                 // Print the game board
                 for (j in 0 until Settings.GAME_BOARD_COLS) {
                     print(gameBoard[i][j].getValue())
                     print(" ")
                 }
                 print("\u001B[D|\n\r")
-            } else if (gameOrMenu == "menu") {
+            } else if (gameOrMenu == GameOrMenu.MENU) {
                 // Print the menu board
                 for (j in 0 until Settings.MENU_BOARD_COLS) {
                     print(menuBoard[i][j].getValue())
@@ -219,16 +222,16 @@ object Screen {
      *
      * @param x The row index of the pixel to update.
      * @param y The column index of the pixel to update.
-     * @param value The new value to set for the pixel (e.g., a character representing alive or dead cells).
+     * @param cellState The new cellState to set for the pixel (e.g., a character representing alive or dead cells).
      */
     public fun updateGameBoardPixel(
         x: Int,
         y: Int,
-        value: String,
+        cellState: CellState,
     ) {
         mutex.acquire()
 
-        gameBoard[x][y].setCharacter(value)
+        gameBoard[x][y].setCharacter(Settings.getCellStateChar(cellState))
 
         mutex.release()
         this.updateScreen()
@@ -239,12 +242,12 @@ object Screen {
      *
      * @param board A 2D array of strings representing the new game board.
      */
-    public fun updateGameBoard(board: Array<Array<String>>) {
+    public fun updateGameBoard(board: Array<Array<CellState>>) {
         mutex.acquire()
 
         for (i in 0 until Settings.ROWS) {
             for (j in 0 until Settings.GAME_BOARD_COLS) {
-                gameBoard[i][j].setCharacter(board[i][j])
+                gameBoard[i][j].setCharacter(Settings.getCellStateChar(board[i][j]))
             }
         }
 
@@ -277,15 +280,15 @@ object Screen {
     public fun switchGameOrMenu() {
         mutex.acquire()
 
-        if (gameOrMenu == "game") {
-            gameOrMenu = "menu"
+        if (gameOrMenu == GameOrMenu.GAME) {
+            gameOrMenu = GameOrMenu.MENU
         } else {
-            gameOrMenu = "game"
+            gameOrMenu = GameOrMenu.GAME
         }
 
         mutex.release()
 
-        if (gameOrMenu == "menu") {
+        if (gameOrMenu == GameOrMenu.MENU) {
             menu = MainMenu
             menu.reset()
             menu.display()

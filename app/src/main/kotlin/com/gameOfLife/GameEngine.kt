@@ -8,7 +8,7 @@ import java.util.concurrent.Semaphore
  */
 object GameEngine {
     // 2D array representing the game board, initialized with dead cells (".")
-    private var board: Array<Array<String>> = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { "." } }
+    private var board: Array<Array<CellState>> = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { CellState.DEAD } }
 
     // Semaphore to manage thread-safe access to the board
     private val boardMutext = Semaphore(1, true)
@@ -22,10 +22,10 @@ object GameEngine {
         boardMutext.acquire()
         val cursor = Screen.getCursor()
 
-        if (board[cursor.first][cursor.second] == ".") {
-            board[cursor.first][cursor.second] = "#"
+        if (board[cursor.first][cursor.second] == CellState.DEAD) {
+            board[cursor.first][cursor.second] = CellState.ALIVE
         } else {
-            board[cursor.first][cursor.second] = "."
+            board[cursor.first][cursor.second] = CellState.DEAD
         }
 
         boardMutext.release()
@@ -41,7 +41,7 @@ object GameEngine {
      * Updates the screen with the new board state.
      */
     fun calculateNewBoard() {
-        var newBoard: Array<Array<String>> = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { "." } }
+        var newBoard: Array<Array<CellState>> = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { CellState.DEAD } }
 
         boardMutext.acquire()
 
@@ -53,10 +53,10 @@ object GameEngine {
                 // Apply Game of Life rules to determine the state of the cell
                 newBoard[row][col] =
                     when {
-                        board[row][col] == "#" && (liveCount < 2 || liveCount > 3) -> "."
-                        board[row][col] == "#" && (liveCount == 2 || liveCount == 3) -> "#"
-                        board[row][col] == "." && liveCount == 3 -> "#"
-                        else -> "."
+                        board[row][col] == CellState.ALIVE && (liveCount < 2 || liveCount > 3) -> CellState.DEAD
+                        board[row][col] == CellState.ALIVE && (liveCount == 2 || liveCount == 3) -> CellState.ALIVE
+                        board[row][col] == CellState.DEAD && liveCount == 3 -> CellState.ALIVE
+                        else -> CellState.DEAD
                     }
             }
         }
@@ -102,7 +102,7 @@ object GameEngine {
             }
 
             // Increment liveCount if the neighboring cell is alive ("#")
-            if (board[newRow][newCol] == "#") {
+            if (board[newRow][newCol] == CellState.ALIVE) {
                 liveCount++
             }
         }

@@ -1,4 +1,4 @@
-package com.gameOfLife
+package com.gameOfLife.menu
 
 /**
  * The `Clickable` interface represents a UI element that can respond to user input (clicks or key presses).

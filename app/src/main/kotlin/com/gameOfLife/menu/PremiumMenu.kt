@@ -1,4 +1,9 @@
-package com.gameOfLife
+package com.gameOfLife.menu
+
+import com.gameOfLife.Action
+import com.gameOfLife.Screen
+import com.gameOfLife.Settings
+import com.gameOfLife.menu.MainMenu.currentMenu
 
 /**
  * The `PremiumMenu` class represents a menu where users can access premium features or go back to the main menu.
@@ -38,8 +43,13 @@ object PremiumMenu : Menu() {
                  * @param key The input key, which is ignored in this case since the action is predefined to return to the parent menu.
                  */
                 override fun query(key: Char) {
-                    MainMenu.currentMenu = this.parent!!
-                    Screen.setMenu(MainMenu.currentMenu)
+                    when (key) {
+                        Settings.getActionKey(Action.SELECT) -> {
+                            currentMenu = this.parent!!
+                            Screen.setMenu(currentMenu)
+                        }
+                        else -> {}
+                    }
                 }
             },
         )
@@ -55,13 +65,13 @@ object PremiumMenu : Menu() {
      * Empty rows are filled with blank spaces after the menu items.
      */
     init {
-        board[0] = centerText(this.text)
+        board[0] = centerText(text)
 
-        for (i in 10..10 + this.children.size - 1) {
-            board[i] = centerText(this.children[i - 10].text)
+        for (i in 10..10 + children.size - 1) {
+            board[i] = centerText(children[i - 10].text)
         }
 
-        for (i in 10 + this.children.size..<Settings.ROWS) {
+        for (i in 10 + children.size..<Settings.ROWS) {
             board[i] = centerText("")
         }
     }
@@ -75,11 +85,11 @@ object PremiumMenu : Menu() {
      */
     override fun query(key: Char) {
         when (key) {
-            ' ' -> {
-                if (this.children[cursor] is Menu) {
+            Settings.getActionKey(Action.SELECT) -> {
+                if (children[cursor] is Menu) {
                     // TODO
                 } else {
-                    this.children[cursor].query(' ')
+                    children[cursor].query(key)
                 }
             }
         }

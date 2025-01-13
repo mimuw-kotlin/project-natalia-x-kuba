@@ -1,6 +1,6 @@
 # TODO list -> second part
 
-## 1) Rework Ads. -> DONE
+## 1) Rework Ads. -> Kuba DONE
   - ASCII characters and colors into recource files 
   - Ad should open a file and create the add
   - Create a class that will abstract a single ad-screen
@@ -14,11 +14,11 @@
 
 ## 4) Infinite field -> Nati // board: hashset<pair>
 
-## 5) Advanced menu -> Kuba
+## 5) Advanced menu -> Kuba DONE
 
-## 6) Replace strings with Enums -> Kuba
+## 6) Replace strings with Enums -> Kuba DONE
 
-## 7) Don't launch on windows -> Kuba
+## 7) Don't launch on windows -> Kuba DONE
 
 ## 8) Micro transactions -> Kuba
 

@@ -1,4 +1,8 @@
-package com.gameOfLife
+package com.gameOfLife.menu
+
+import com.gameOfLife.Action
+import com.gameOfLife.Screen
+import com.gameOfLife.Settings
 
 object MainMenu : Menu() {
     // The text that represents the title of the menu
@@ -8,7 +12,7 @@ object MainMenu : Menu() {
     override var parent: Menu? = null
 
     // List of menu options, which in this case are multiple instances of PremiumMenu
-    override var children: Array<Clickable> = Array(5) { PremiumMenu }
+    override var children: Array<Clickable> = arrayOf(PremiumMenu, PremiumMenu, PremiumMenu, ChangeKeyMenu)
 
     // Keeps track of the currently active menu
     var currentMenu: Menu = this
@@ -39,28 +43,28 @@ object MainMenu : Menu() {
         // Handle the key press based on the current menu state
         when (key) {
             // Move the cursor up through the options
-            'w' -> {
+            Settings.getActionKey(Action.UP) -> {
                 unmarkHovered()
                 cursor = (cursor - 1 + children.size) % children.size
                 markHovered()
                 Screen.updateMenuBoard(board)
             }
             // Move the cursor down through the options
-            's' -> {
+            Settings.getActionKey(Action.DOWN) -> {
                 unmarkHovered()
                 cursor = (cursor + 1) % children.size
                 markHovered()
                 Screen.updateMenuBoard(board)
             }
             // Select the current hovered option
-            ' ' -> {
+            Settings.getActionKey(Action.SELECT) -> {
                 // If the selected option is a sub-menu, switch to that menu
                 if (children[cursor] is Menu) {
                     currentMenu = children[cursor] as Menu
                     children[cursor].parent = this
                     Screen.setMenu(currentMenu)
                 } else {
-                    children[cursor].query(' ')
+                    children[cursor].query(key)
                 }
             }
         }

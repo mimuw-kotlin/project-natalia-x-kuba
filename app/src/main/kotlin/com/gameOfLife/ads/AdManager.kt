@@ -99,7 +99,7 @@ object AdManager {
         for (adFrame in adWifi.frames) {
             for (row in 0 until 6) {
                 for (col in 0 until 20) {
-                    adFrame.changePixel(row + 13, col, Pixel(lines[row][col].toString()))
+                    adFrame.changePixel(row + 13, col, Pixel(lines[row][col]))
                 }
             }
         }

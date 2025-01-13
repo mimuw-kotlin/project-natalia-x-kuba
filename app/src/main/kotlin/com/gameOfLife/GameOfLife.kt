@@ -1,8 +1,16 @@
 package com.gameOfLife
 
 import com.gameOfLife.ads.AdManager
+import com.gameOfLife.menu.MainMenu
+import com.gameOfLife.menu.SelectMenu
 
 fun main() {
+    // Apologize for windows
+    if (System.getProperty("os.name").contains("Windows", ignoreCase = true)) {
+        println("Sorry, this program is not supported on Windows.")
+        return
+    }
+
     // Initialize the main menu, game board, timer, and advertisements
     val menu = MainMenu
 
@@ -23,44 +31,48 @@ fun main() {
         Runtime.getRuntime().exec(arrayOf("/bin/sh", "-c", "stty raw -echo < /dev/tty")).waitFor()
 
         // Variable to track whether the user is in the "game" or "menu" state
-        var gameOrMenu = "game"
+        var gameOrMenu = GameOrMenu.GAME
 
         // Main loop, handling user input for game or menu navigation
         while (true) {
             val key = System.`in`.read().toChar() // Read user input from the terminal
 
             // Handle input based on whether the user is in the game or menu
-            if (gameOrMenu == "game") {
+            if (gameOrMenu == GameOrMenu.GAME) {
                 when (key) {
                     // Movement commands for the game cursor
-                    'w' -> Screen.moveCursor("UP")
-                    's' -> Screen.moveCursor("DOWN")
-                    'a' -> Screen.moveCursor("LEFT")
-                    'd' -> Screen.moveCursor("RIGHT")
+                    Settings.getActionKey(Action.UP) -> Screen.moveCursor(Action.UP)
+                    Settings.getActionKey(Action.DOWN) -> Screen.moveCursor(Action.DOWN)
+                    Settings.getActionKey(Action.LEFT) -> Screen.moveCursor(Action.LEFT)
+                    Settings.getActionKey(Action.RIGHT) -> Screen.moveCursor(Action.RIGHT)
                     // Change the state of the selected cell on the game board
-                    ' ' -> GameEngine.changeBoardPixel()
+                    Settings.getActionKey(Action.SELECT) -> GameEngine.changeBoardPixel()
                     // Adjust the game speed
-                    ',' -> Timer.decreaseSpeed()
-                    '.' -> Timer.increaseSpeed()
+                    Settings.getActionKey(Action.SPEED_DOWN) -> Timer.decreaseSpeed()
+                    Settings.getActionKey(Action.SPEED_UP) -> Timer.increaseSpeed()
                     // Switch to the menu state
-                    'e' -> {
-                        gameOrMenu = "menu"
+                    Settings.getActionKey(Action.MENU) -> {
+                        gameOrMenu = GameOrMenu.MENU
                         Screen.switchGameOrMenu()
                     }
                     // Exit the program
-                    'q' -> break
+                    Settings.getActionKey(Action.QUIT) -> break
                 }
             } else { // gameOrMenu == "menu"
-                when (key) {
-                    // Switch back to the game state
-                    'e' -> {
-                        gameOrMenu = "game"
-                        Screen.switchGameOrMenu()
+                if (menu.currentMenu is SelectMenu) {
+                    menu.query(key)
+                } else {
+                    when (key) {
+                        // Switch back to the game state
+                        Settings.getActionKey(Action.MENU) -> {
+                            gameOrMenu = GameOrMenu.GAME
+                            Screen.switchGameOrMenu()
+                        }
+                        // Exit the program
+                        Settings.getActionKey(Action.QUIT) -> break
+                        // Handle menu-specific input
+                        else -> menu.query(key)
                     }
-                    // Exit the program
-                    'q' -> break
-                    // Handle menu-specific input
-                    else -> menu.query(key)
                 }
             }
         }

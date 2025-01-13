@@ -9,7 +9,7 @@ package com.gameOfLife
  * @param color The color of the character. This is an ANSI color code or a custom color code.
  * @param bgColor The background color of the pixel. This is an ANSI background color code or a custom color code.
  */
-class Pixel(private var character: String, private var color: String, private var bgColor: String) {
+class Pixel(private var character: Char, private var color: String, private var bgColor: String) {
     // ANSI escape sequence to reset text formatting
     private val reset = "\u001b[0m"
 
@@ -19,7 +19,7 @@ class Pixel(private var character: String, private var color: String, private va
      *
      * @param character The character to display in the pixel.
      */
-    constructor(character: String) : this(character, "", "")
+    constructor(character: Char) : this(character, "", "")
 
     /**
      * Secondary constructor for creating a pixel with a character and a color.
@@ -28,7 +28,7 @@ class Pixel(private var character: String, private var color: String, private va
      * @param character The character to display in the pixel.
      * @param color The color of the character. Supported values include "red", "green", "blue", "black", "white", or a custom color code.
      */
-    constructor(character: String, color: String) : this(character, color, "") {
+    constructor(character: Char, color: String) : this(character, color, "") {
         setColor(color)
     }
 
@@ -47,7 +47,7 @@ class Pixel(private var character: String, private var color: String, private va
      *
      * @return The character stored in the pixel.
      */
-    public fun getCharacter(): String {
+    public fun getCharacter(): Char {
         return this.character
     }
 
@@ -56,7 +56,7 @@ class Pixel(private var character: String, private var color: String, private va
      *
      * @param character The new character to display in the pixel.
      */
-    public fun setCharacter(character: String) {
+    public fun setCharacter(character: Char) {
         this.character = character
     }
 
@@ -103,7 +103,7 @@ class Pixel(private var character: String, private var color: String, private va
          * @return An array of `Pixel` objects where each element represents a character from the string.
          */
         fun createArray(line: String): Array<Pixel> {
-            return Array(line.length) { Pixel(line[it].toString()) }
+            return Array(line.length) { Pixel(line[it]) }
         }
 
         /**
@@ -118,7 +118,7 @@ class Pixel(private var character: String, private var color: String, private va
             line: String,
             color: String,
         ): Array<Pixel> {
-            return Array(line.length) { Pixel(line[it].toString(), color) }
+            return Array(line.length) { Pixel(line[it], color) }
         }
     }
 }
