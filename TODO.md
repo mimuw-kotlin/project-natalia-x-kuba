@@ -12,7 +12,7 @@
 
 ## 3) Camera movement -> Nati
 
-## 4) Infinite field -> Nati
+## 4) Infinite field -> Nati // board: hashset<pair>
 
 ## 5) Advanced menu -> Kuba
 
