@@ -1,12 +1,14 @@
 package com.gameOfLife
 
+import com.gameOfLife.ads.AdManager
+
 fun main() {
     // Initialize the main menu, game board, timer, and advertisements
     val menu = MainMenu
 
     // Initialize two background threads for the timer and ads, ensuring they run concurrently
     val threadTimer = Thread { Timer.run() }
-    val threadAd = Thread { Ad.run() }
+    val threadAdManager = Thread { AdManager.run() }
 
     // Initialize and update the screen before entering the main loop
     Screen.initScreen()
@@ -15,7 +17,7 @@ fun main() {
     try {
         // Start both background threads (timer and ads)
         threadTimer.start()
-        threadAd.start()
+        threadAdManager.start()
 
         // Disable input echoing in the terminal and set it to raw mode for non-buffered input
         Runtime.getRuntime().exec(arrayOf("/bin/sh", "-c", "stty raw -echo < /dev/tty")).waitFor()
@@ -68,7 +70,7 @@ fun main() {
     } finally {
         // Interrupt the background threads for the timer and advertisements when the program ends
         threadTimer.interrupt()
-        threadAd.interrupt()
+        threadAdManager.interrupt()
 
         // Restore the terminal's input settings to their original state
         Runtime.getRuntime().exec(arrayOf("/bin/sh", "-c", "stty -raw echo < /dev/tty")).waitFor()
