@@ -7,7 +7,8 @@ import com.gameOfLife.Settings
 // Abstract class representing a Menu, which implements Clickable
 abstract class Menu : Clickable {
     // 2D array representing the board where the menu items are drawn
-    var board: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.MENU_BOARD_COLS) { Pixel(' ') } }
+    var board: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.MAX_MENU_BOARD_COLS) { Pixel(' ') } }
+    var boardText: Array<String> = Array(Settings.ROWS) { " " }
 
     // An array of Clickable elements (submenus or other options in the menu)
     abstract var children: Array<Clickable>
@@ -19,14 +20,16 @@ abstract class Menu : Clickable {
     init {
         reset()
         // Populate the board with default content (static text and other items)
-        board[1] = Pixel.createArray("                                       ")
-        board[2] = Pixel.createArray("  _____ ____        ___  _     _       ")
-        board[3] = Pixel.createArray(" |_   _|  _ \\ __ _ / _ \\| |   | |      ")
-        board[4] = Pixel.createArray("   | | | |_) / _` | | | | |   | |      ")
-        board[5] = Pixel.createArray("   | | |  _ < (_| | |_| | |___| |___   ")
-        board[6] = Pixel.createArray("   |_| |_| \\_\\__, |\\___/|_____|_____|   ")
-        board[7] = Pixel.createArray("              |___/                    ")
-        board[8] = Pixel.createArray("                                       ")
+        boardText[1] = "                                       "
+        boardText[2] = "  _____ ____        ___  _     _       "
+        boardText[3] = " |_   _|  _ \\ __ _ / _ \\| |   | |      "
+        boardText[4] = "   | | | |_) / _` | | | | |   | |      "
+        boardText[5] = "   | | |  _ < (_| | |_| | |___| |___   "
+        boardText[6] = "   |_| |_| \\_\\__, |\\___/|_____|_____|  "
+        boardText[7] = "              |___/                    "
+        boardText[8] = "                                       "
+
+        updateBoard()
     }
 
     /**
@@ -36,16 +39,18 @@ abstract class Menu : Clickable {
      * @param leftPadding Optional padding for the text (default is 0).
      * @return A Pixel array representing the centered text.
      */
-    fun centerText(
-        text: String,
-        leftPadding: Int = 0,
-    ): Array<Pixel> {
-        // Calculate the space needed for padding
-        val space = Settings.MENU_BOARD_COLS - text.length - leftPadding
-        val leftSpace = space / 2
+    companion object {
+        fun centerText(
+            text: String,
+            leftPadding: Int = 0,
+        ): Array<Pixel> {
+            // Calculate the space needed for padding
+            val space = Settings.menuBoardCols - text.length - leftPadding
+            val leftSpace = space / 2
 
-        // Create a Pixel array with spaces on both sides of the text
-        return Pixel.createArray(" ".repeat(leftPadding + leftSpace) + text + " ".repeat(space - leftSpace))
+            // Create a Pixel array with spaces on both sides of the text
+            return Pixel.createArray(" ".repeat(leftPadding + leftSpace) + text + " ".repeat(space - leftSpace))
+        }
     }
 
     /**
@@ -53,6 +58,7 @@ abstract class Menu : Clickable {
      */
     fun display() {
         cursor = 0
+        updateBoard()
         Screen.updateMenuBoard(board) // Update the screen with the current menu board
     }
 
@@ -79,6 +85,17 @@ abstract class Menu : Clickable {
     open fun reset() {
         unmarkHovered()
         cursor = 0
+
+        // If there are children (submenus), mark the first one as hovered
+        if (!this.children.isNullOrEmpty() && this.children.isNotEmpty()) {
+            markHovered()
+        }
+    }
+
+    fun updateBoard() {
+        for (i in 0 until Settings.ROWS) {
+            board[i] = centerText(boardText[i])
+        }
 
         // If there are children (submenus), mark the first one as hovered
         if (!this.children.isNullOrEmpty() && this.children.isNotEmpty()) {

@@ -7,12 +7,12 @@
   - Create a class that will abstract a single ad (static or with animations)
   - Ad should have a funcion 'play', which will display the ad
 
-## 2) Change window size -> Kuba
+## 2) Change window size -> Kuba DONE
   - increase size to the left and right, but keep a minimum and maximum
 
-## 3) Camera movement -> Nati
+## 3) Camera movement -> Nati DONE
 
-## 4) Infinite field -> Nati // board: hashset<pair>
+## 4) Infinite field -> Nati : needs calculateNewBoard()
 
 ## 5) Advanced menu -> Kuba DONE
 

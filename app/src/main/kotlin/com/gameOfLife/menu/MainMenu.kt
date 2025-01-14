@@ -19,16 +19,16 @@ object MainMenu : Menu() {
 
     init {
         // Set the title of the current menu at the top of the board (row 0)
-        board[0] = centerText(text)
+        boardText[0] = text
 
         // Set the menu options below the title, starting from row 10
         for (i in 10..10 + children.size - 1) {
-            board[i] = centerText(children[i - 10].text)
+            boardText[i] = children[i - 10].text
         }
 
         // Clear the remaining rows below the options
         for (i in 10 + children.size..<Settings.ROWS) {
-            board[i] = centerText("")
+            boardText[i] = ""
         }
     }
 
@@ -44,16 +44,14 @@ object MainMenu : Menu() {
         when (key) {
             // Move the cursor up through the options
             Settings.getActionKey(Action.UP) -> {
-                unmarkHovered()
                 cursor = (cursor - 1 + children.size) % children.size
-                markHovered()
+                updateBoard()
                 Screen.updateMenuBoard(board)
             }
             // Move the cursor down through the options
             Settings.getActionKey(Action.DOWN) -> {
-                unmarkHovered()
                 cursor = (cursor + 1) % children.size
-                markHovered()
+                updateBoard()
                 Screen.updateMenuBoard(board)
             }
             // Select the current hovered option

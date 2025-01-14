@@ -65,14 +65,14 @@ object PremiumMenu : Menu() {
      * Empty rows are filled with blank spaces after the menu items.
      */
     init {
-        board[0] = centerText(text)
+        boardText[0] = text
 
         for (i in 10..10 + children.size - 1) {
-            board[i] = centerText(children[i - 10].text)
+            boardText[i] = children[i - 10].text
         }
 
         for (i in 10 + children.size..<Settings.ROWS) {
-            board[i] = centerText("")
+            boardText[i] = ""
         }
     }
 

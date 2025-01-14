@@ -36,15 +36,15 @@ object ChangeKeyMenu : Menu() {
                         Settings.getActionKey(Action.LEFT) -> {
                             currentKey = Action.getPrev(currentKey)
                             text = "◀ Select Key: $currentKey ▶"
-                            board[cursor + 10] = centerText(text)
-                            markHovered()
+                            boardText[cursor + 10] = text
+                            updateBoard()
                             Screen.updateMenuBoard(board)
                         }
                         Settings.getActionKey(Action.RIGHT) -> {
                             currentKey = Action.getNext(currentKey)
                             text = "◀ Select Key: $currentKey ▶"
-                            board[cursor + 10] = centerText(text)
-                            markHovered()
+                            boardText[cursor + 10] = text
+                            updateBoard()
                             Screen.updateMenuBoard(board)
                         }
                         Settings.getActionKey(Action.SELECT) -> {
@@ -99,14 +99,14 @@ object ChangeKeyMenu : Menu() {
      * Empty rows are filled with blank spaces after the menu items.
      */
     init {
-        board[0] = centerText(text)
+        boardText[0] = text
 
         for (i in 10..10 + children.size - 1) {
-            board[i] = centerText(children[i - 10].text)
+            boardText[i] = children[i - 10].text
         }
 
         for (i in 10 + children.size..<Settings.ROWS) {
-            board[i] = centerText("")
+            boardText[i] = ""
         }
     }
 
@@ -122,14 +122,14 @@ object ChangeKeyMenu : Menu() {
             Settings.getActionKey(Action.UP) -> {
                 unmarkHovered()
                 cursor = (cursor - 1 + children.size) % children.size
-                markHovered()
+                updateBoard()
                 Screen.updateMenuBoard(board)
             }
             // Move the cursor down through the options
             Settings.getActionKey(Action.DOWN) -> {
                 unmarkHovered()
                 cursor = (cursor + 1) % children.size
-                markHovered()
+                updateBoard()
                 Screen.updateMenuBoard(board)
             }
             // Select the current hovered option

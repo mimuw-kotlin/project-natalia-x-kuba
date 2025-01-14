@@ -8,7 +8,7 @@ import java.util.concurrent.Semaphore
  */
 object GameEngine {
     // 2D array representing the game board, initialized with dead cells (".")
-    private var board: Array<Array<CellState>> = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { CellState.DEAD } }
+    private var board: HashMap<Pair<Int, Int>, CellState> = hashMapOf()
 
     // Semaphore to manage thread-safe access to the board
     private val boardMutext = Semaphore(1, true)
@@ -21,15 +21,16 @@ object GameEngine {
     fun changeBoardPixel() {
         boardMutext.acquire()
         val cursor = Screen.getCursor()
+        val currPosition = Pair(Settings.camera.first + cursor.first, Settings.camera.second + cursor.second)
 
-        if (board[cursor.first][cursor.second] == CellState.DEAD) {
-            board[cursor.first][cursor.second] = CellState.ALIVE
+        if (board.getOrDefault(currPosition, CellState.DEAD) == CellState.DEAD) {
+            board.put(currPosition, CellState.ALIVE)
         } else {
-            board[cursor.first][cursor.second] = CellState.DEAD
+            board.remove(currPosition)
         }
 
         boardMutext.release()
-        Screen.updateGameBoardPixel(cursor.first, cursor.second, board[cursor.first][cursor.second])
+        Screen.updateGameBoardPixel(currPosition, board.getOrDefault(currPosition, CellState.DEAD))
     }
 
     /**
@@ -41,7 +42,12 @@ object GameEngine {
      * Updates the screen with the new board state.
      */
     fun calculateNewBoard() {
-        var newBoard: Array<Array<CellState>> = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { CellState.DEAD } }
+        // TODO()
+    }
+
+    /*
+     {
+        var newBoard: Array<Array<CellState>> = Array(Settings.ROWS) { Array(Settings.gameBoardCols) { CellState.DEAD } }
 
         boardMutext.acquire()
 
@@ -97,7 +103,7 @@ object GameEngine {
             val newCol = col + direction.second
 
             // Skip cells that are out of bounds
-            if (newRow < 0 || newRow >= Settings.ROWS || newCol < 0 || newCol >= Settings.GAME_BOARD_COLS) {
+            if (newRow < 0 || newRow >= Settings.ROWS || newCol < 0 || newCol >= Settings.gameBoardCols) {
                 continue
             }
 
@@ -109,4 +115,5 @@ object GameEngine {
 
         return liveCount
     }
+     */
 }

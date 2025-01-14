@@ -50,6 +50,14 @@ fun main() {
                     // Adjust the game speed
                     Settings.getActionKey(Action.SPEED_DOWN) -> Timer.decreaseSpeed()
                     Settings.getActionKey(Action.SPEED_UP) -> Timer.increaseSpeed()
+                    // Adjust the width of the game board
+                    Settings.getActionKey(Action.WIDTH_INC) -> Screen.increaseBoardWidth()
+                    Settings.getActionKey(Action.WIDTH_DEC) -> Screen.decreaseBoardWidth()
+                    // Move the camera on the game board
+                    Settings.getActionKey(Action.CAM_UP) -> Screen.moveCamera(Action.CAM_UP)
+                    Settings.getActionKey(Action.CAM_DOWN) -> Screen.moveCamera(Action.CAM_DOWN)
+                    Settings.getActionKey(Action.CAM_LEFT) -> Screen.moveCamera(Action.CAM_LEFT)
+                    Settings.getActionKey(Action.CAM_RIGHT) -> Screen.moveCamera(Action.CAM_RIGHT)
                     // Switch to the menu state
                     Settings.getActionKey(Action.MENU) -> {
                         gameOrMenu = GameOrMenu.MENU

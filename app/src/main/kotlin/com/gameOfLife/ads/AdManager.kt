@@ -106,7 +106,6 @@ object AdManager {
     }
 
     init {
-        // initLame()
         adLame = AnimatedAd(arrayOf((AdFrame("src/main/resources/ads/lame.txt"))))
         adLame.play(Screen, 0)
 
@@ -121,12 +120,10 @@ object AdManager {
                     AdFrame("src/main/resources/ads/wifi3.txt"),
                 ),
             )
-
         initWifiNetworks()
         initWifi()
 
         ads = arrayOf(adCodeforia, adXtb, adWifi)
-        Thread.sleep(1000)
     }
 
     /**

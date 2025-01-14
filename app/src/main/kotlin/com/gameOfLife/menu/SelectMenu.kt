@@ -12,11 +12,11 @@ object SelectMenu : Menu() {
     public var keyToChange: Action = Action.UP
 
     init {
-        board[0] = centerText(text)
+        boardText[0] = text
 
-        board[11] = centerText("Press a key to change the keybind")
-        board[12] = centerText("Strongly advised to use only A-Z, 0-9")
-        board[13] = centerText("")
+        boardText[11] = "Press a key to change the keybind"
+        boardText[12] = "Strongly advised to use only A-Z, 0-9"
+        boardText[13] = ""
     }
 
     override fun query(key: Char) {
@@ -24,10 +24,12 @@ object SelectMenu : Menu() {
         if (Settings.setKey(keyToChange, key)) {
             localText = "SUCCESS"
         }
-        board[13] = centerText(localText)
+        boardText[13] = localText
+        updateBoard()
         Screen.updateMenuBoard(board)
         Thread.sleep(500)
-        board[13] = centerText(" ")
+        boardText[13] = " "
+        updateBoard()
         currentMenu = this.parent!!
         Screen.setMenu(currentMenu)
     }

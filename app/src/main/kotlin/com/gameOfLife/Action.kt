@@ -9,7 +9,13 @@ enum class Action {
     SPEED_DOWN,
     SPEED_UP,
     MENU,
-    QUIT, ;
+    QUIT,
+    WIDTH_INC,
+    WIDTH_DEC,
+    CAM_UP,
+    CAM_DOWN,
+    CAM_LEFT,
+    CAM_RIGHT, ;
 
     companion object {
         fun getNext(action: Action): Action {

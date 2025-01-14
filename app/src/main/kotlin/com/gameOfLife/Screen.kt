@@ -12,8 +12,8 @@ object Screen {
     private var time = 0
     private var speed = 1
     private var cursor = Pair(0, 0)
-    private var gameBoard = Array(Settings.ROWS) { Array(Settings.GAME_BOARD_COLS) { Pixel(Settings.getCellStateChar(CellState.DEAD)) } }
-    private var menuBoard = Array(Settings.ROWS) { Array(Settings.MENU_BOARD_COLS) { Pixel('?') } }
+    private val gameBoard: HashMap<Pair<Int, Int>, CellState> = hashMapOf()
+    private var menuBoard = Array(Settings.ROWS) { Array(Settings.MAX_MENU_BOARD_COLS) { Pixel('?') } }
     private var gameOrMenu = GameOrMenu.GAME
     private var ad = Array(Settings.ROWS) { Array(Settings.AD_COLS) { Pixel('$') } }
 
@@ -31,8 +31,6 @@ object Screen {
         print("\u001b[H\u001b[2J")
         // Hide the cursor
         print("\u001B[?25l")
-        // Set the background color of the cursor to grey
-        gameBoard[cursor.first][cursor.second].setBgColor("grey")
         System.out.flush()
 
         mutex.release()
@@ -48,20 +46,38 @@ object Screen {
     public fun moveCursor(direction: Action) {
         mutex.acquire()
 
-        // Remove grey background from the current cursor position
-        gameBoard[cursor.first][cursor.second].setBgColor("")
-
         // Update cursor position based on direction
         when (direction) {
             Action.UP -> cursor = Pair((cursor.first - 1 + Settings.ROWS) % Settings.ROWS, cursor.second)
             Action.DOWN -> cursor = Pair((cursor.first + 1) % Settings.ROWS, cursor.second)
-            Action.LEFT -> cursor = Pair(cursor.first, (cursor.second - 1 + Settings.GAME_BOARD_COLS) % Settings.GAME_BOARD_COLS)
-            Action.RIGHT -> cursor = Pair(cursor.first, (cursor.second + 1) % Settings.GAME_BOARD_COLS)
+            Action.LEFT -> cursor = Pair(cursor.first, (cursor.second - 1 + Settings.gameBoardCols) % Settings.gameBoardCols)
+            Action.RIGHT -> cursor = Pair(cursor.first, (cursor.second + 1) % Settings.gameBoardCols)
             else -> {}
         }
 
-        // Set the new position of the cursor with grey background
-        gameBoard[cursor.first][cursor.second].setBgColor("grey")
+        mutex.release()
+        this.updateScreen()
+    }
+
+    public fun moveCamera(direction: Action) {
+        mutex.acquire()
+
+        // Update camera position based on direction
+        when (direction) {
+            Action.CAM_UP -> {
+                Settings.camera = Pair(Settings.camera.first + 1, Settings.camera.second)
+            }
+            Action.CAM_DOWN -> {
+                Settings.camera = Pair(Settings.camera.first - 1, Settings.camera.second)
+            }
+            Action.CAM_LEFT -> {
+                Settings.camera = Pair(Settings.camera.first, Settings.camera.second + 1)
+            }
+            Action.CAM_RIGHT -> {
+                Settings.camera = Pair(Settings.camera.first, Settings.camera.second - 1)
+            }
+            else -> {}
+        }
 
         mutex.release()
         this.updateScreen()
@@ -90,17 +106,24 @@ object Screen {
      * Updates the screen by printing the current game and menu boards, along with the time and speed.
      * It also handles the display of ads and board content, updating the view based on whether the user is in the game or menu state.
      */
-    public fun updateScreen() {
+    public fun updateScreen(hardReset: Boolean = false) {
         mutex.acquire()
 
         repeat(Settings.ROWS + 3) { print("\r\u001b[1A") }
+        if (hardReset) {
+            print("\u001b[H\u001b[2J")
+        }
         val timeText = getTime()
         val speedText = getSpeed()
 
         // print top row
-        print("TRgOLL NxK  \t\t$timeText\t\t  Speed: $speedText\n\r")
+        val width = 2 * Settings.gameBoardCols + Settings.AD_COLS + 2
+        val spaces = width - 10 - 12 - 8 // len for "TRgOLL NxK", timeText and speedText
+        val leftPad = " ".repeat(spaces / 2)
+        val rightPad = " ".repeat(spaces - spaces / 2)
+        print("TRgOLL NxK" + leftPad + timeText + rightPad + "Speed: $speedText\n\r")
 
-        repeat(2 * Settings.GAME_BOARD_COLS + Settings.AD_COLS + 2) { print("-") }
+        repeat(width) { print("-") }
         print("\n\r")
 
         // Print the boards: ad board, game or menu board
@@ -115,21 +138,25 @@ object Screen {
             print("|")
             if (gameOrMenu == GameOrMenu.GAME) {
                 // Print the game board
-                for (j in 0 until Settings.GAME_BOARD_COLS) {
-                    print(gameBoard[i][j].getValue())
+                for (j in 0 until Settings.gameBoardCols) {
+                    val currPosition = Pair(i + Settings.camera.first, j + Settings.camera.second)
+                    val color = if (cursor == Pair(i, j)) "grey" else ""
+                    val px = Pixel(Settings.getCellStateChar(gameBoard.getOrDefault(currPosition, CellState.DEAD)))
+                    px.setBgColor(color)
+                    print(px.getValue())
                     print(" ")
                 }
                 print("\u001B[D|\n\r")
             } else if (gameOrMenu == GameOrMenu.MENU) {
                 // Print the menu board
-                for (j in 0 until Settings.MENU_BOARD_COLS) {
+                for (j in 0 until Settings.menuBoardCols) {
                     print(menuBoard[i][j].getValue())
                 }
                 print("|\n\r")
             }
         }
 
-        repeat(2 * Settings.GAME_BOARD_COLS + Settings.AD_COLS + 2) { print("-") }
+        repeat(2 * Settings.gameBoardCols + Settings.AD_COLS + 2) { print("-") }
         println()
 
         System.out.flush()
@@ -225,13 +252,16 @@ object Screen {
      * @param cellState The new cellState to set for the pixel (e.g., a character representing alive or dead cells).
      */
     public fun updateGameBoardPixel(
-        x: Int,
-        y: Int,
+        position: Pair<Int, Int>,
         cellState: CellState,
     ) {
         mutex.acquire()
 
-        gameBoard[x][y].setCharacter(Settings.getCellStateChar(cellState))
+        if (cellState == CellState.DEAD) {
+            gameBoard.remove(position)
+        } else {
+            gameBoard[position] = cellState
+        }
 
         mutex.release()
         this.updateScreen()
@@ -242,13 +272,13 @@ object Screen {
      *
      * @param board A 2D array of strings representing the new game board.
      */
-    public fun updateGameBoard(board: Array<Array<CellState>>) {
+    public fun updateGameBoard(board: HashMap<Pair<Int, Int>, CellState>) {
         mutex.acquire()
 
-        for (i in 0 until Settings.ROWS) {
-            for (j in 0 until Settings.GAME_BOARD_COLS) {
-                gameBoard[i][j].setCharacter(Settings.getCellStateChar(board[i][j]))
-            }
+        gameBoard.clear()
+
+        for ((position, cellState) in board) {
+            gameBoard[position] = cellState
         }
 
         mutex.release()
@@ -264,7 +294,7 @@ object Screen {
         mutex.acquire()
 
         for (i in 0 until Settings.ROWS) {
-            for (j in 0 until Settings.MENU_BOARD_COLS) {
+            for (j in 0 until Settings.menuBoardCols) {
                 menuBoard[i][j] = board[i][j]
             }
         }
@@ -301,5 +331,17 @@ object Screen {
         this.menu = menu
         menu.reset()
         menu.display()
+    }
+
+    public fun increaseBoardWidth() {
+        if (!Settings.changeWidth(1)) return
+
+        this.updateScreen(true)
+    }
+
+    public fun decreaseBoardWidth() {
+        if (!Settings.changeWidth(-1)) return
+
+        this.updateScreen(true)
     }
 }
