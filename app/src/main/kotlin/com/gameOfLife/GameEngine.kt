@@ -7,7 +7,6 @@ import java.util.concurrent.Semaphore
  * It ensures thread-safe access to the board using a semaphore.
  */
 object GameEngine {
-    // 2D array representing the game board, initialized with dead cells (".")
     private var board: HashMap<Pair<Int, Int>, CellState> = hashMapOf()
 
     // Semaphore to manage thread-safe access to the board
@@ -42,47 +41,9 @@ object GameEngine {
      * Updates the screen with the new board state.
      */
     fun calculateNewBoard() {
-        // TODO()
-    }
+        var newBoard: HashMap<Pair<Int, Int>, CellState> = hashMapOf()
+        var countBoard: HashMap<Pair<Int, Int>, Int> = hashMapOf()
 
-    /*
-     {
-        var newBoard: Array<Array<CellState>> = Array(Settings.ROWS) { Array(Settings.gameBoardCols) { CellState.DEAD } }
-
-        boardMutext.acquire()
-
-        // Iterate through each cell on the board
-        for (row in board.indices) {
-            for (col in board[row].indices) {
-                val liveCount = countLiveNeighbors(row, col)
-
-                // Apply Game of Life rules to determine the state of the cell
-                newBoard[row][col] =
-                    when {
-                        board[row][col] == CellState.ALIVE && (liveCount < 2 || liveCount > 3) -> CellState.DEAD
-                        board[row][col] == CellState.ALIVE && (liveCount == 2 || liveCount == 3) -> CellState.ALIVE
-                        board[row][col] == CellState.DEAD && liveCount == 3 -> CellState.ALIVE
-                        else -> CellState.DEAD
-                    }
-            }
-        }
-
-        board = newBoard // Update the board with the new state
-        boardMutext.release() // Release semaphore after update
-        Screen.updateGameBoard(board) // Update the screen with the new board state
-    }
-
-    /**
-     * Counts the number of live neighbors surrounding a cell at the given row and column.
-     *
-     * @param row the row index of the cell.
-     * @param col the column index of the cell.
-     * @return the number of live neighbors.
-     */
-    private fun countLiveNeighbors(
-        row: Int,
-        col: Int,
-    ): Int {
         val directions =
             listOf(
                 Pair(-1, -1),
@@ -95,25 +56,34 @@ object GameEngine {
                 Pair(1, 1),
             )
 
-        var liveCount = 0
+        boardMutext.acquire()
 
-        // Iterate through each direction to check for live neighbors
-        for (direction in directions) {
-            val newRow = row + direction.first
-            val newCol = col + direction.second
+        for (cell in board) {
+            for (direction in directions) {
+                val newRow = cell.key.first + direction.first
+                val newCol = cell.key.second + direction.second
 
-            // Skip cells that are out of bounds
-            if (newRow < 0 || newRow >= Settings.ROWS || newCol < 0 || newCol >= Settings.gameBoardCols) {
-                continue
-            }
-
-            // Increment liveCount if the neighboring cell is alive ("#")
-            if (board[newRow][newCol] == CellState.ALIVE) {
-                liveCount++
+                countBoard[Pair(newRow, newCol)] = countBoard.getOrDefault(Pair(newRow, newCol), 0) + 1
             }
         }
 
-        return liveCount
+        for (cell in countBoard) {
+            val count = cell.value
+            val state = board.getOrDefault(cell.key, CellState.DEAD)
+
+            if (state == CellState.ALIVE) {
+                if (count == 2 || count == 3) {
+                    newBoard[cell.key] = CellState.ALIVE
+                }
+            } else {
+                if (count == 3) {
+                    newBoard[cell.key] = CellState.ALIVE
+                }
+            }
+        }
+
+        board = newBoard
+        boardMutext.release()
+        Screen.updateGameBoard(board)
     }
-     */
 }

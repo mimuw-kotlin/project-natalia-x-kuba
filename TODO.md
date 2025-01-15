@@ -10,9 +10,9 @@
 ## 2) Change window size -> Kuba DONE
   - increase size to the left and right, but keep a minimum and maximum
 
-## 3) Camera movement -> Nati DONE
+## 3) Camera movement -> Natalia DONE
 
-## 4) Infinite field -> Nati : needs calculateNewBoard()
+## 4) Infinite field -> Natalia DONE
 
 ## 5) Advanced menu -> Kuba DONE
 
@@ -22,6 +22,6 @@
 
 ## 8) Micro transactions -> Kuba
 
-## 9) Threads -> coroutines -> Nati
+## 9) Threads -> coroutines -> Natalia
 
-## 10) Tests -> Nati
+## 10) Tests -> Natalia
