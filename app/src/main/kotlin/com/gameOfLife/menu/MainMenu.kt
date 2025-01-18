@@ -4,7 +4,7 @@ import com.gameOfLife.Action
 import com.gameOfLife.Screen
 import com.gameOfLife.Settings
 
-object MainMenu : Menu() {
+object MainMenu : Menu(null) {
     // The text that represents the title of the menu
     override var text: String = "Main Menu"
 
@@ -12,7 +12,7 @@ object MainMenu : Menu() {
     override var parent: Menu? = null
 
     // List of menu options, which in this case are multiple instances of PremiumMenu
-    override var children: Array<Clickable> = arrayOf(PremiumMenu, PremiumMenu, PremiumMenu, ChangeKeyMenu)
+    override var children: Array<Clickable> = arrayOf(PremiumMenu(this), PremiumMenu(this), PremiumMenu(this), ChangeSettingsMenu(this))
 
     // Keeps track of the currently active menu
     var currentMenu: Menu = this
@@ -59,7 +59,6 @@ object MainMenu : Menu() {
                 // If the selected option is a sub-menu, switch to that menu
                 if (children[cursor] is Menu) {
                     currentMenu = children[cursor] as Menu
-                    children[cursor].parent = this
                     Screen.setMenu(currentMenu)
                 } else {
                     children[cursor].query(key)

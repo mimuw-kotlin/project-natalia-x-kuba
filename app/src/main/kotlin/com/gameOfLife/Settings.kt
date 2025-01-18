@@ -44,6 +44,14 @@ object Settings {
             CellState.ALIVE to '#',
         )
 
+    private val cellRanges: MutableMap<CellRange, Int> =
+        mutableMapOf(
+            CellRange.ALIVE_LOW to 2,
+            CellRange.ALIVE_HIGH to 3,
+            CellRange.DEAD_LOW to 3,
+            CellRange.DEAD_HIGH to 3,
+        )
+
     private val usedKeys: MutableSet<Char> = keyBindings.values.toMutableSet()
 
     fun setKey(
@@ -62,6 +70,21 @@ object Settings {
         usedKeys.add(newKey)
 
         return true
+    }
+
+    fun unlockPremium() {
+        boardCharacters[CellState.ALIVE] = '$'
+    }
+
+    fun setCellRange(
+        cellRange: CellRange,
+        newValue: Int,
+    ) {
+        cellRanges[cellRange] = newValue
+    }
+
+    fun getCellRange(cellRange: CellRange): Int {
+        return cellRanges[cellRange]!!
     }
 
     fun getActionKey(action: Action): Char {

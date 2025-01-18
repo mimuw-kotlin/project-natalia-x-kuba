@@ -72,11 +72,11 @@ object GameEngine {
             val state = board.getOrDefault(cell.key, CellState.DEAD)
 
             if (state == CellState.ALIVE) {
-                if (count == 2 || count == 3) {
+                if (count in Settings.getCellRange(CellRange.ALIVE_LOW)..Settings.getCellRange(CellRange.ALIVE_HIGH)) {
                     newBoard[cell.key] = CellState.ALIVE
                 }
             } else {
-                if (count == 3) {
+                if (count in Settings.getCellRange(CellRange.DEAD_LOW)..Settings.getCellRange(CellRange.DEAD_HIGH)) {
                     newBoard[cell.key] = CellState.ALIVE
                 }
             }

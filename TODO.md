@@ -20,7 +20,7 @@
 
 ## 7) Don't launch on windows -> Kuba DONE
 
-## 8) Micro transactions -> Kuba
+## 8) Micro transactions -> Kuba DONE
 
 ## 9) Threads -> coroutines -> Natalia
 

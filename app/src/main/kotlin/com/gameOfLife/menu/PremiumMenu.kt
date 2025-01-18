@@ -10,7 +10,7 @@ import com.gameOfLife.menu.MainMenu.currentMenu
  * It extends from the abstract `Menu` class and provides a specific implementation for the premium menu UI and interactions.
  * The menu includes an option to go back to the `MainMenu`.
  */
-object PremiumMenu : Menu() {
+class PremiumMenu(parent: Menu?) : Menu(parent) {
     /**
      * The text displayed at the top of the premium menu. It is typically a prompt for users to explore premium features.
      */
@@ -23,41 +23,29 @@ object PremiumMenu : Menu() {
     override var children: Array<Clickable> =
         arrayOf(
             object : Clickable {
-                // Text for the "Back" option to return to the Main Menu
-                override var text: String = "Back"
+                override var text = "Enter *premium* code!"
 
-                /**
-                 * The parent menu of this clickable item. It is dynamically resolved to refer to `PremiumMenu`.
-                 * This allows us to navigate back to the `PremiumMenu`'s parent, which could be another menu in the future.
-                 */
-                override var parent: Menu?
-                    get() = PremiumMenu.parent // Dynamically resolve the parent
-                    set(value) {
-                        PremiumMenu.parent = value // Update PremiumMenu's parent dynamically
+                override var parent: Menu? = this@PremiumMenu
+
+                fun done(number: Int): Boolean {
+                    if (number == 6969) {
+                        Settings.unlockPremium()
+                        return true
                     }
+                    return false
+                }
 
-                /**
-                 * Handles user input to navigate back to the parent menu. In this case, it switches back to the `MainMenu`.
-                 * This method is invoked when the user selects the "Back" option.
-                 *
-                 * @param key The input key, which is ignored in this case since the action is predefined to return to the parent menu.
-                 */
                 override fun query(key: Char) {
                     when (key) {
                         Settings.getActionKey(Action.SELECT) -> {
-                            currentMenu = this.parent!!
+                            currentMenu = EnterNumberMenu(this.parent, "Choose a number!", 4, 0, 9999, ::done)
                             Screen.setMenu(currentMenu)
                         }
-                        else -> {}
                     }
                 }
             },
+            Back(this.parent),
         )
-
-    /**
-     * The parent menu for the `PremiumMenu`. This is set dynamically to the `MainMenu` when navigating between menus.
-     */
-    override var parent: Menu? = null
 
     /**
      * Initializes the premium menu by setting up the board and populating it with the menu text and clickable options.
@@ -67,12 +55,14 @@ object PremiumMenu : Menu() {
     init {
         boardText[0] = text
 
+        boardText[14] = "Currently we accept only cash"
+        boardText[15] = "Please donate $69.69"
+        boardText[16] = "to unlock ALL premium features"
+        boardText[17] = "You will receive a premium code"
+        boardText[18] = "that You can enter above"
+
         for (i in 10..10 + children.size - 1) {
             boardText[i] = children[i - 10].text
-        }
-
-        for (i in 10 + children.size..<Settings.ROWS) {
-            boardText[i] = ""
         }
     }
 
@@ -85,12 +75,32 @@ object PremiumMenu : Menu() {
      */
     override fun query(key: Char) {
         when (key) {
+            // Move the cursor up through the options
+            Settings.getActionKey(Action.UP) -> {
+                unmarkHovered()
+                cursor = (cursor - 1 + children.size) % children.size
+                updateBoard()
+                Screen.updateMenuBoard(board)
+            }
+            // Move the cursor down through the options
+            Settings.getActionKey(Action.DOWN) -> {
+                unmarkHovered()
+                cursor = (cursor + 1) % children.size
+                updateBoard()
+                Screen.updateMenuBoard(board)
+            }
+            // Select the current hovered option
             Settings.getActionKey(Action.SELECT) -> {
+                // If the selected option is a sub-menu, switch to that menu
                 if (children[cursor] is Menu) {
-                    // TODO
+                    currentMenu = children[cursor] as Menu
+                    Screen.setMenu(currentMenu)
                 } else {
                     children[cursor].query(key)
                 }
+            }
+            else -> {
+                children[cursor].query(key)
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.gameOfLife
 
 import com.gameOfLife.ads.AdManager
+import com.gameOfLife.menu.EnterNumberMenu
 import com.gameOfLife.menu.MainMenu
 import com.gameOfLife.menu.SelectMenu
 
@@ -67,7 +68,7 @@ fun main() {
                     Settings.getActionKey(Action.QUIT) -> break
                 }
             } else { // gameOrMenu == "menu"
-                if (menu.currentMenu is SelectMenu) {
+                if (menu.currentMenu is SelectMenu || menu.currentMenu is EnterNumberMenu) {
                     menu.query(key)
                 } else {
                     when (key) {

@@ -1,6 +1,7 @@
 package com.gameOfLife.menu
 
 import com.gameOfLife.Action
+import com.gameOfLife.CellRange
 import com.gameOfLife.Screen
 import com.gameOfLife.Settings
 import com.gameOfLife.menu.MainMenu.currentMenu
@@ -8,11 +9,11 @@ import com.gameOfLife.menu.MainMenu.currentMenu
 /**
  * The `ChangeKeyMenu` class represents a menu where users can change the key bindings for the game actions.
  */
-object ChangeKeyMenu : Menu() {
+class ChangeSettingsMenu(parent: Menu?) : Menu(parent) {
     /**
      * The text displayed at the top of the change-key-menu.
      */
-    override var text: String = "Change Key Bindings"
+    override var text: String = "Change Settings"
 
     /**
      * The list of clickable options in the menu. Currently, it contains a single option to go back to the main menu.
@@ -20,16 +21,12 @@ object ChangeKeyMenu : Menu() {
      */
     override var children: Array<Clickable> =
         arrayOf(
-            PremiumMenu,
+            PremiumMenu(this),
             object : Clickable {
                 var currentKey = Action.UP
                 override var text = "◀ Select Key: $currentKey ▶"
 
-                override var parent: Menu?
-                    get() = ChangeKeyMenu.parent // Dynamically resolve the parent
-                    set(value) {
-                        ChangeKeyMenu.parent = value // Update PremiumMenu's parent dynamically
-                    }
+                override var parent: Menu? = this@ChangeSettingsMenu
 
                 override fun query(key: Char) {
                     when (key) {
@@ -48,50 +45,48 @@ object ChangeKeyMenu : Menu() {
                             Screen.updateMenuBoard(board)
                         }
                         Settings.getActionKey(Action.SELECT) -> {
-                            currentMenu = SelectMenu
-                            SelectMenu.parent = ChangeKeyMenu
-                            SelectMenu.keyToChange = currentKey
+                            currentMenu = SelectMenu(this.parent, currentKey)
                             Screen.setMenu(currentMenu)
                         }
                     }
                 }
             },
             object : Clickable {
-                // Text for the "Back" option to return to the Main Menu
-                override var text: String = "Back"
+                var currentKey = CellRange.ALIVE_LOW
+                override var text = "◀ Select Key: $currentKey ▶"
 
-                /**
-                 * The parent menu of this clickable item. It is dynamically resolved to refer to `PremiumMenu`.
-                 * This allows us to navigate back to the `PremiumMenu`'s parent, which could be another menu in the future.
-                 */
-                override var parent: Menu?
-                    get() = ChangeKeyMenu.parent // Dynamically resolve the parent
-                    set(value) {
-                        ChangeKeyMenu.parent = value // Update PremiumMenu's parent dynamically
-                    }
+                override var parent: Menu? = this@ChangeSettingsMenu
 
-                /**
-                 * Handles user input to navigate back to the parent menu. In this case, it switches back to the `MainMenu`.
-                 * This method is invoked when the user selects the "Back" option.
-                 *
-                 * @param key The input key, which is ignored in this case since the action is predefined to return to the parent menu.
-                 */
+                fun done(number: Int): Boolean {
+                    Settings.setCellRange(currentKey, number)
+                    return true
+                }
+
                 override fun query(key: Char) {
                     when (key) {
+                        Settings.getActionKey(Action.LEFT) -> {
+                            currentKey = CellRange.getPrev(currentKey)
+                            text = "◀ Select Key: $currentKey ▶"
+                            boardText[cursor + 10] = text
+                            updateBoard()
+                            Screen.updateMenuBoard(board)
+                        }
+                        Settings.getActionKey(Action.RIGHT) -> {
+                            currentKey = CellRange.getNext(currentKey)
+                            text = "◀ Select Key: $currentKey ▶"
+                            boardText[cursor + 10] = text
+                            updateBoard()
+                            Screen.updateMenuBoard(board)
+                        }
                         Settings.getActionKey(Action.SELECT) -> {
-                            currentMenu = this.parent!!
+                            currentMenu = EnterNumberMenu(this.parent, "Choose a number!", 1, 1, 8, ::done)
                             Screen.setMenu(currentMenu)
                         }
-                        else -> {}
                     }
                 }
             },
+            Back(this.parent),
         )
-
-    /**
-     * The parent menu for the `ChangeKeyMenu`. This is set dynamically to the `MainMenu` when navigating between menus.
-     */
-    override var parent: Menu? = null
 
     /**
      * Initializes the premium menu by setting up the board and populating it with the menu text and clickable options.
@@ -137,7 +132,6 @@ object ChangeKeyMenu : Menu() {
                 // If the selected option is a sub-menu, switch to that menu
                 if (children[cursor] is Menu) {
                     currentMenu = children[cursor] as Menu
-                    children[cursor].parent = this
                     Screen.setMenu(currentMenu)
                 } else {
                     children[cursor].query(key)

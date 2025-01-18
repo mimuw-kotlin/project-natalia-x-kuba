@@ -5,11 +5,9 @@ import com.gameOfLife.Screen
 import com.gameOfLife.Settings
 import com.gameOfLife.menu.MainMenu.currentMenu
 
-object SelectMenu : Menu() {
+class SelectMenu(parent: Menu?, private var keyToChange: Action) : Menu(parent) {
     override var text: String = "Select New UNIQUE keybind"
-    override var parent: Menu? = null
     override var children: Array<Clickable> = arrayOf()
-    public var keyToChange: Action = Action.UP
 
     init {
         boardText[0] = text

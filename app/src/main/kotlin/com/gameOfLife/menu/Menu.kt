@@ -5,7 +5,7 @@ import com.gameOfLife.Screen
 import com.gameOfLife.Settings
 
 // Abstract class representing a Menu, which implements Clickable
-abstract class Menu : Clickable {
+abstract class Menu(override var parent: Menu?) : Clickable {
     // 2D array representing the board where the menu items are drawn
     var board: Array<Array<Pixel>> = Array(Settings.ROWS) { Array(Settings.MAX_MENU_BOARD_COLS) { Pixel(' ') } }
     var boardText: Array<String> = Array(Settings.ROWS) { " " }
