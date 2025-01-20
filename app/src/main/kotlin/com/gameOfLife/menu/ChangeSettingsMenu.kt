@@ -28,7 +28,7 @@ class ChangeSettingsMenu(parent: Menu?) : Menu(parent) {
 
                 override var parent: Menu? = this@ChangeSettingsMenu
 
-                override fun query(key: Char) {
+                override suspend fun query(key: Char) {
                     when (key) {
                         Settings.getActionKey(Action.LEFT) -> {
                             currentKey = Action.getPrev(currentKey)
@@ -62,7 +62,7 @@ class ChangeSettingsMenu(parent: Menu?) : Menu(parent) {
                     return true
                 }
 
-                override fun query(key: Char) {
+                override suspend fun query(key: Char) {
                     when (key) {
                         Settings.getActionKey(Action.LEFT) -> {
                             currentKey = CellRange.getPrev(currentKey)
@@ -111,7 +111,7 @@ class ChangeSettingsMenu(parent: Menu?) : Menu(parent) {
      *
      * @param key The input key pressed by the user.
      */
-    override fun query(key: Char) {
+    override suspend fun query(key: Char) {
         when (key) {
             // Move the cursor up through the options
             Settings.getActionKey(Action.UP) -> {

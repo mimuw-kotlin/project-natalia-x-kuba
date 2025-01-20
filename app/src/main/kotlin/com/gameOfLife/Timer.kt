@@ -1,6 +1,13 @@
 package com.gameOfLife
 
-import java.util.concurrent.Semaphore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * The `Timer` class is responsible for managing the in-game time and controlling the speed of the game.
@@ -8,32 +15,22 @@ import java.util.concurrent.Semaphore
  * The `run` method continuously updates the game state based on the current speed.
  */
 object Timer {
-    private var localTime = 0 // Tracks the local time in the game (in seconds)
-    private var speed = 1 // Game speed, determines how fast the game progresses (range: 0-5)
-    private val sleep = Semaphore(1, true) // Semaphore to control game pause state (sleeping when speed is 0)
-    private val mutex = Semaphore(1, true) // Mutex to ensure thread-safe operations
+    private var localTime = AtomicInteger(0) // Tracks the local time in the game (in seconds)
+    private val speed = AtomicInteger(1) // Game speed, determines how fast the game progresses (range: 0-5)
+
+    private var timerJob: Job? = null // Job to manage the coroutine running the game loop
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob()) // Coroutine scope for the timer
 
     /**
      * Increases the game speed, up to a maximum of 5.
-     * When speed is increased, the game updates the displayed speed and releases any pause state.
+     * When speed is increased, the game updates the displayed speed and resumes if paused.
      */
-    fun increaseSpeed() {
-        try {
-            mutex.acquire() // Acquire mutex to ensure thread safety
-
-            if (speed == 5) {
-                mutex.release()
-                return
-            }
-            speed += 1
-            if (speed == 1) {
-                sleep.release() // Release sleep semaphore if the speed increases from 0 to 1; unpause the game,
-            }
-
-            mutex.release()
-            Screen.updateSpeed(speed)
-        } catch (ignored: InterruptedException) {
-            // Handle InterruptedException if the thread is interrupted
+    suspend fun increaseSpeed() {
+        val currentSpeed = speed.get()
+        if (currentSpeed < 5) {
+            speed.incrementAndGet()
+            Screen.updateSpeed(speed.get())
+            resumeIfPaused()
         }
     }
 
@@ -41,57 +38,63 @@ object Timer {
      * Decreases the game speed, down to a minimum of 0 (pause state).
      * When speed is decreased, the game updates the displayed speed and pauses if necessary.
      */
-    fun decreaseSpeed() {
-        try {
-            mutex.acquire()
-            if (speed == 0) {
-                mutex.release()
-                return
-            }
-
-            speed -= 1
-
-            if (speed == 0) {
-                mutex.release()
-                sleep.acquire() // Pause the game.
-            } else {
-                mutex.release()
-            }
-            Screen.updateSpeed(speed)
-        } catch (ignored: InterruptedException) {
-            // Handle InterruptedException if the thread is interrupted
+    suspend fun decreaseSpeed() {
+        val currentSpeed = speed.get()
+        if (currentSpeed > 0) {
+            speed.decrementAndGet()
+            Screen.updateSpeed(speed.get())
         }
     }
 
     /**
-     * The main loop of the `Timer`. Continuously updates the game state and increments the time.
-     * It calculates the new state of the game board at each tick and updates the screen accordingly.
-     * The loop respects the current speed and pauses when necessary.
+     * Starts or resumes the game loop. If the game is paused, it will resume.
      */
-    fun run() {
-        try {
-            while (true) {
-                mutex.acquire()
+    suspend fun run() {
+        if (timerJob == null || timerJob?.isCancelled == true) {
+            timerJob =
+                scope.launch {
+                    while (isActive) {
+                        val currentSpeed = speed.get()
 
-                // If the game is paused (speed == 0), wait until the speed is increased
-                while (speed == 0) {
-                    mutex.release()
-                    sleep.acquire()
-                    mutex.acquire()
+                        if (currentSpeed == 0) {
+                            pauseGame()
+                            delay(Long.MAX_VALUE)
+                        }
+
+                        delay(1000L / currentSpeed)
+
+                        localTime.incrementAndGet()
+                        Screen.updateTime(localTime.get())
+                        GameEngine.calculateNewBoard()
+                    }
                 }
-                mutex.release()
-
-                Thread.sleep(1000L / speed) // Wait for the appropriate time based on the current speed
-
-                mutex.acquire() // Acquire mutex before modifying the time and game state
-                localTime += 1 // Increment the local game time
-                Screen.updateTime(localTime) // Update the screen with the new time
-                GameEngine.calculateNewBoard() // Calculate and update the board based on the rules of the game
-                sleep.release() // Allow the game to run at the current speed again
-                mutex.release() // Release the mutex
-            }
-        } catch (ignored: InterruptedException) {
-            // If the thread is interrupted, exit the loop gracefully
         }
+    }
+
+    /**
+     * Pauses the game by canceling the active timer coroutine.
+     */
+    private fun pauseGame() {
+        timerJob?.cancel()
+    }
+
+    /**
+     * Resumes the game if it is currently paused and the speed is greater than 0.
+     */
+    private suspend fun resumeIfPaused() {
+        if (speed.get() > 0 && (timerJob == null || timerJob?.isCancelled == true)) {
+            run()
+        }
+    }
+
+    /**
+     * Stops the game completely by canceling the job and resetting the timer state.
+     */
+    suspend fun stop() {
+        timerJob?.cancel()
+        localTime.set(0)
+        speed.set(1)
+        Screen.updateTime(localTime.get())
+        Screen.updateSpeed(speed.get())
     }
 }

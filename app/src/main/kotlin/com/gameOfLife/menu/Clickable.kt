@@ -12,5 +12,5 @@ interface Clickable {
      *
      * @param key the character key pressed by the user.
      */
-    fun query(key: Char)
+    suspend fun query(key: Char)
 }

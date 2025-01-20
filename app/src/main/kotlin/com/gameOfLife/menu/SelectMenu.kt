@@ -17,7 +17,7 @@ class SelectMenu(parent: Menu?, private var keyToChange: Action) : Menu(parent) 
         boardText[13] = ""
     }
 
-    override fun query(key: Char) {
+    override suspend fun query(key: Char) {
         var localText = "FAILURE"
         if (Settings.setKey(keyToChange, key)) {
             localText = "SUCCESS"

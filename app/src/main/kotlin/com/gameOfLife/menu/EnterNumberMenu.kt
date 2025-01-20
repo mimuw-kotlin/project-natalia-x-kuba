@@ -24,7 +24,7 @@ class EnterNumberMenu(
         boardText[13] = "Your input: "
     }
 
-    override fun query(key: Char) {
+    override suspend fun query(key: Char) {
         localText += key
         boardText[13] = "Your input: $localText"
         updateBoard()

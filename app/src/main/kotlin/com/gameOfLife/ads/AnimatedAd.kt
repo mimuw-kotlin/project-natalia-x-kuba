@@ -3,7 +3,7 @@ package com.gameOfLife.ads
 import com.gameOfLife.Screen
 
 class AnimatedAd(public val frames: Array<AdFrame>) {
-    fun play(
+    suspend fun play(
         screen: Screen,
         time: Int,
         times: Int = 1,

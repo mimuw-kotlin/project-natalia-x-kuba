@@ -33,7 +33,7 @@ object MainMenu : Menu(null) {
     }
 
     // This method handles the user's input (key presses)
-    override fun query(key: Char) {
+    override suspend fun query(key: Char) {
         // If the current menu is not the MainMenu, pass the query to the child menu
         if (currentMenu != this) {
             currentMenu.query(key)

@@ -35,7 +35,7 @@ class PremiumMenu(parent: Menu?) : Menu(parent) {
                     return false
                 }
 
-                override fun query(key: Char) {
+                override suspend fun query(key: Char) {
                     when (key) {
                         Settings.getActionKey(Action.SELECT) -> {
                             currentMenu = EnterNumberMenu(this.parent, "Choose a number!", 4, 0, 9999, ::done)
@@ -73,7 +73,7 @@ class PremiumMenu(parent: Menu?) : Menu(parent) {
      *
      * @param key The input key pressed by the user. The only recognized key here is the spacebar (' ').
      */
-    override fun query(key: Char) {
+    override suspend fun query(key: Char) {
         when (key) {
             // Move the cursor up through the options
             Settings.getActionKey(Action.UP) -> {

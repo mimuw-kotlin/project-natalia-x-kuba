@@ -2,6 +2,7 @@ package com.gameOfLife.ads
 
 import com.gameOfLife.Pixel
 import com.gameOfLife.Screen
+import kotlinx.coroutines.runBlocking
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -107,7 +108,10 @@ object AdManager {
 
     init {
         adLame = AnimatedAd(arrayOf((AdFrame("src/main/resources/ads/lame.txt"))))
-        adLame.play(Screen, 0)
+        runBlocking {
+            adLame.play(Screen, 0)
+        }
+        // adLame.play(Screen, 0)
 
         adCodeforia = AnimatedAd(arrayOf(AdFrame("src/main/resources/ads/codeforia.txt")))
         adXtb = AnimatedAd(arrayOf(AdFrame("src/main/resources/ads/xtb.txt")))
@@ -129,7 +133,7 @@ object AdManager {
     /**
      * Main function to cycle through ads and update the screen with each ad.
      */
-    fun run() {
+    suspend fun run() {
         try {
             while (true) {
                 // Cycle through the ads in the list

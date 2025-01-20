@@ -56,7 +56,7 @@ abstract class Menu(override var parent: Menu?) : Clickable {
     /**
      * Display the menu by resetting cursor and updating the screen.
      */
-    fun display() {
+    suspend fun display() {
         cursor = 0
         updateBoard()
         Screen.updateMenuBoard(board) // Update the screen with the current menu board

@@ -15,7 +15,7 @@ class Back(override var parent: Menu?) : Clickable {
      *
      * @param key The input key, which is ignored in this case since the action is predefined to return to the parent menu.
      */
-    override fun query(key: Char) {
+    override suspend fun query(key: Char) {
         when (key) {
             Settings.getActionKey(Action.SELECT) -> {
                 currentMenu = this.parent!!
