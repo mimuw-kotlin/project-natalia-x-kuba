@@ -35,6 +35,50 @@ object GameEngine {
     }
 
     /**
+     * Toggles the state of a pixel on the board based on the given position.
+     * If the cell is dead (.), it becomes alive (#), and vice versa.
+     * Updates the corresponding pixel on the screen. This function is used
+     * for testing purposes.
+     *
+     * @param position The position of the pixel to change on the board.
+     */
+    suspend fun proxyChangeBoardPixel(position: Pair<Int, Int>) {
+        val currPosition: Pair<Int, Int>
+
+        boardMutex.withLock {
+            currPosition = position
+
+            if (board.getOrDefault(currPosition, CellState.DEAD) == CellState.DEAD) {
+                board.put(currPosition, CellState.ALIVE)
+            } else {
+                board.remove(currPosition)
+            }
+        }
+        Screen.updateGameBoardPixel(currPosition, board.getOrDefault(currPosition, CellState.DEAD))
+    }
+
+    /**
+     * Returns the current state of the board.
+     * This function is used for testing purposes.
+     *
+     * @return The current state of the board.
+     */
+    suspend fun getBoard(): HashMap<Pair<Int, Int>, CellState> {
+        boardMutex.withLock {
+            return board
+        }
+    }
+
+    /**
+     * Clears the board. Used for tests.
+     */
+    suspend fun clearBoard() {
+        boardMutex.withLock {
+            board = hashMapOf()
+        }
+    }
+
+    /**
      * Calculates the new state of the board based on the Game of Life rules:
      * - Any live cell with fewer than two live neighbors dies (underpopulation).
      * - Any live cell with more than three live neighbors dies (overpopulation).

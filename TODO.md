@@ -22,6 +22,6 @@
 
 ## 8) Micro transactions -> Kuba DONE
 
-## 9) Threads -> coroutines -> Natalia
+## 9) Threads -> coroutines -> Natalia DONE
 
-## 10) Tests -> Natalia
+## 10) Tests -> Natalia 
