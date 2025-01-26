@@ -111,7 +111,7 @@ object Screen {
             val timeText = getTime()
             val speedText = getSpeed()
 
-            // print top row
+            // Print top row
             val width = 2 * Settings.gameBoardCols + Settings.AD_COLS + 2
             val spaces = width - 10 - 12 - 8 // len for "TRgOLL NxK", timeText and speedText
             val leftPad = " ".repeat(spaces / 2)

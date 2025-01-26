@@ -2,6 +2,7 @@ package com.gameOfLife
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
+import java.io.File
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 
@@ -121,154 +122,68 @@ class GameOfLifeTest {
     }
 
     @Test
-    fun octagon2() {
-        val period1 =
-            listOf(
-                Pair(8, 9),
-                Pair(4, 5),
-                Pair(5, 6),
-                Pair(7, 8),
-                Pair(8, 10),
-                Pair(5, 7),
-                Pair(6, 8),
-                Pair(3, 5),
-                Pair(4, 8),
-                Pair(5, 9),
-                Pair(5, 10),
-                Pair(3, 8),
-                Pair(10, 5),
-                Pair(8, 3),
-                Pair(9, 5),
-                Pair(8, 4),
-                Pair(5, 3),
-                Pair(10, 8),
-                Pair(7, 5),
-                Pair(8, 6),
-                Pair(9, 8),
-                Pair(5, 4),
-                Pair(6, 5),
-                Pair(8, 7),
-            )
+    fun manyTests() {
+        val inputDirectoryPath = "src/test/kotlin/com/gameOfLife/testInputs"
+        val outputDirectoryPath = "src/test/kotlin/com/gameOfLife/testOutputs"
 
-        val period2 =
-            listOf(
-                Pair(4, 5),
-                Pair(8, 9),
-                Pair(5, 6),
-                Pair(7, 8),
-                Pair(5, 7),
-                Pair(6, 8),
-                Pair(4, 8),
-                Pair(5, 9),
-                Pair(9, 5),
-                Pair(8, 4),
-                Pair(7, 5),
-                Pair(8, 6),
-                Pair(9, 8),
-                Pair(5, 4),
-                Pair(6, 5),
-                Pair(8, 7),
-            )
+        val inputDirectory = File(inputDirectoryPath)
+        val outputDirectory = File(outputDirectoryPath)
 
-        val period3 =
-            listOf(
-                Pair(4, 5),
-                Pair(8, 9),
-                Pair(5, 6),
-                Pair(7, 8),
-                Pair(4, 6),
-                Pair(5, 7),
-                Pair(6, 8),
-                Pair(7, 9),
-                Pair(4, 7),
-                Pair(6, 9),
-                Pair(4, 8),
-                Pair(5, 9),
-                Pair(9, 5),
-                Pair(8, 4),
-                Pair(9, 6),
-                Pair(7, 4),
-                Pair(9, 7),
-                Pair(6, 4),
-                Pair(7, 5),
-                Pair(8, 6),
-                Pair(5, 4),
-                Pair(9, 8),
-                Pair(6, 5),
-                Pair(8, 7),
-            )
+        inputDirectory.listFiles { _, name -> name.endsWith(".in") }?.forEach { inputFile ->
+            val inputFileName = inputFile.name
+            val correspondingOutputFileName = inputFileName.replace(".in", ".out")
+            val correspondingOutputFile = File(outputDirectory, correspondingOutputFileName)
 
-        val period4 =
-            listOf(
-                Pair(4, 5),
-                Pair(8, 9),
-                Pair(3, 6),
-                Pair(7, 10),
-                Pair(4, 8),
-                Pair(5, 9),
-                Pair(6, 10),
-                Pair(3, 7),
-                Pair(9, 5),
-                Pair(10, 6),
-                Pair(7, 3),
-                Pair(8, 4),
-                Pair(10, 7),
-                Pair(6, 3),
-                Pair(5, 4),
-                Pair(9, 8),
-            )
+            if (correspondingOutputFile.exists()) {
+                val expectedOutput = correspondingOutputFile.readText()
+                val input = inputFile.readText()
 
-        val period5 =
-            listOf(
-                Pair(4, 5),
-                Pair(8, 9),
-                Pair(4, 6),
-                Pair(7, 9),
-                Pair(4, 7),
-                Pair(6, 9),
-                Pair(3, 6),
-                Pair(7, 10),
-                Pair(4, 8),
-                Pair(5, 9),
-                Pair(6, 10),
-                Pair(3, 7),
-                Pair(9, 5),
-                Pair(10, 6),
-                Pair(7, 3),
-                Pair(8, 4),
-                Pair(9, 6),
-                Pair(10, 7),
-                Pair(6, 3),
-                Pair(7, 4),
-                Pair(9, 7),
-                Pair(6, 4),
-                Pair(5, 4),
-                Pair(9, 8),
-            )
+                val inputLines = input.lines()
+                val expectedOutputLines = expectedOutput.lines()
 
-        val octacon1: Map<Pair<Int, Int>, CellState> = period1.associateWith { CellState.ALIVE }.toMap()
-        val octacon2: Map<Pair<Int, Int>, CellState> = period2.associateWith { CellState.ALIVE }.toMap()
-        val octacon3: Map<Pair<Int, Int>, CellState> = period3.associateWith { CellState.ALIVE }.toMap()
-        val octacon4: Map<Pair<Int, Int>, CellState> = period4.associateWith { CellState.ALIVE }.toMap()
-        val octacon5: Map<Pair<Int, Int>, CellState> = period5.associateWith { CellState.ALIVE }.toMap()
+                val board = hashMapOf<Pair<Int, Int>, CellState>()
+                for (i in inputLines.indices - 1) {
+                    for (j in inputLines[i].indices) {
+                        if (inputLines[i][j] == '#') {
+                            board[Pair(i, j / 2)] = CellState.ALIVE
+                        }
+                    }
+                }
 
-        runBlocking {
-            for (position in period1) {
-                GameEngine.proxyChangeBoardPixel(position)
-            }
+                println("Running test for $inputFileName")
 
-            for (i in 0 until 10) {
-                GameEngine.calculateNewBoard()
-                when (i % 5) {
-                    0 -> assertEquals(octacon2, GameEngine.getBoard())
-                    1 -> assertEquals(octacon3, GameEngine.getBoard())
-                    2 -> assertEquals(octacon4, GameEngine.getBoard())
-                    3 -> assertEquals(octacon5, GameEngine.getBoard())
-                    4 -> assertEquals(octacon1, GameEngine.getBoard())
+                val numberOfIterations = inputLines.last().toInt()
+                println("Number of iterations: $numberOfIterations")
+
+                runBlocking {
+                    resetBoard()
+
+                    for ((position, state) in board) {
+                        if (state == CellState.ALIVE) {
+                            GameEngine.proxyChangeBoardPixel(position)
+                        }
+                    }
+
+                    for (i in 0 until numberOfIterations) {
+                        GameEngine.calculateNewBoard()
+                    }
+
+                    val actualOutput = StringBuilder()
+                    for (i in 0 until Settings.ROWS) {
+                        for (j in 0 until Settings.gameBoardCols) {
+                            val currPosition = Pair(i, j)
+                            if (GameEngine.getBoard().containsKey(currPosition)) {
+                                actualOutput.append("# ")
+                            } else {
+                                actualOutput.append(". ")
+                            }
+                        }
+                        actualOutput.append(System.lineSeparator())
+                    }
+
+                    assertEquals(expectedOutputLines, actualOutput.toString().lines())
                 }
             }
         }
     }
-
-    
 }
