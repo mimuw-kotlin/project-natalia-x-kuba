@@ -149,7 +149,7 @@ class GameOfLifeTest {
                         }
                     }
                 }
-                
+
                 val numberOfIterations = inputLines.last().toInt()
 
                 runBlocking {
@@ -183,4 +183,7 @@ class GameOfLifeTest {
             }
         }
     }
+
+    @Test
+    
 }
