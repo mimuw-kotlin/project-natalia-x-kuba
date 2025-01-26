@@ -183,7 +183,4 @@ class GameOfLifeTest {
             }
         }
     }
-
-    @Test
-    
 }
