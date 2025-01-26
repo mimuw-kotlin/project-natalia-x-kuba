@@ -149,11 +149,8 @@ class GameOfLifeTest {
                         }
                     }
                 }
-
-                println("Running test for $inputFileName")
-
+                
                 val numberOfIterations = inputLines.last().toInt()
-                println("Number of iterations: $numberOfIterations")
 
                 runBlocking {
                     resetBoard()
